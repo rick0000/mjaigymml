@@ -1,0 +1,4 @@
+git+https://github.com/rick0000/mjaigym.git@v0.1.0
+black
+flake8
+autopep8
