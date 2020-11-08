@@ -1,0 +1,529 @@
+{"type": "start_game", "seed": 1913266417, "names": ["manue3", "manue2", "manue1", "manue0"]}
+{"type": "start_kyoku", "bakaze": "E", "kyoku": 1, "honba": 0, "kyotaku": 0, "oya": 0, "dora_marker": "W", "tehais": [["5pr", "4m", "6p", "E", "1m", "2s", "5m", "8s", "9p", "5s", "N", "N", "3m"], ["7p", "3s", "6s", "6m", "6p", "2p", "7s", "C", "5mr", "1m", "4m", "C", "E"], ["C", "9p", "7p", "7p", "8m", "9m", "6m", "E", "P", "1p", "2s", "C", "8m"], ["8s", "9m", "6s", "9m", "8p", "4p", "W", "8m", "4m", "5m", "7s", "4p", "7p"]]}
+{"type": "tsumo", "actor": 0, "pai": "2p"}
+{"type": "dahai", "actor": 0, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "1s"}
+{"type": "dahai", "actor": 1, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "4s"}
+{"type": "dahai", "actor": 2, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "3m"}
+{"type": "dahai", "actor": 3, "pai": "W", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "1m"}
+{"type": "dahai", "actor": 0, "pai": "5s", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "5s"}
+{"type": "dahai", "actor": 1, "pai": "1m", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "9p"}
+{"type": "dahai", "actor": 2, "pai": "P", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "S"}
+{"type": "dahai", "actor": 3, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "3p"}
+{"type": "dahai", "actor": 0, "pai": "9p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "1m"}
+{"type": "dahai", "actor": 1, "pai": "1m", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "2m"}
+{"type": "dahai", "actor": 2, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "9s"}
+{"type": "dahai", "actor": 3, "pai": "9s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "8p"}
+{"type": "dahai", "actor": 0, "pai": "8p", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "7m"}
+{"type": "dahai", "actor": 1, "pai": "2p", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "2p"}
+{"type": "dahai", "actor": 2, "pai": "2m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "9p"}
+{"type": "reach", "actor": 3}
+{"type": "dahai", "actor": 3, "pai": "9m", "tsumogiri": false}
+{"type": "reach_accepted", "actor": 3, "deltas": [0, 0, 0, -1000], "scores": [25000, 25000, 25000, 24000]}
+{"type": "tsumo", "actor": 0, "pai": "3s"}
+{"type": "dahai", "actor": 0, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "7m"}
+{"type": "dahai", "actor": 1, "pai": "C", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "6m"}
+{"type": "dahai", "actor": 2, "pai": "C", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "2s"}
+{"type": "dahai", "actor": 3, "pai": "2s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "2m"}
+{"type": "dahai", "actor": 0, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "3s"}
+{"type": "dahai", "actor": 1, "pai": "C", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "2m"}
+{"type": "dahai", "actor": 2, "pai": "C", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "S"}
+{"type": "dahai", "actor": 3, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "8p"}
+{"type": "dahai", "actor": 0, "pai": "2s", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "9m"}
+{"type": "dahai", "actor": 1, "pai": "9m", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "4s"}
+{"type": "dahai", "actor": 2, "pai": "2s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "5s"}
+{"type": "dahai", "actor": 3, "pai": "5s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "3m"}
+{"type": "dahai", "actor": 0, "pai": "8s", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "4s"}
+{"type": "dahai", "actor": 1, "pai": "5s", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "5m"}
+{"type": "dahai", "actor": 2, "pai": "6m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "6s"}
+{"type": "dahai", "actor": 3, "pai": "6s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "8s"}
+{"type": "dahai", "actor": 0, "pai": "8s", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "7s"}
+{"type": "dahai", "actor": 1, "pai": "6s", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "1s"}
+{"type": "dahai", "actor": 2, "pai": "6m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "6p"}
+{"type": "dahai", "actor": 3, "pai": "6p", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "P"}
+{"type": "dahai", "actor": 0, "pai": "6p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "1p"}
+{"type": "dahai", "actor": 1, "pai": "6p", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "F"}
+{"type": "dahai", "actor": 2, "pai": "9p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "3p"}
+{"type": "dahai", "actor": 3, "pai": "3p", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "7s"}
+{"type": "dahai", "actor": 0, "pai": "3p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "4p"}
+{"type": "dahai", "actor": 1, "pai": "6m", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "2s"}
+{"type": "dahai", "actor": 2, "pai": "9p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "S"}
+{"type": "dahai", "actor": 3, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "2p"}
+{"type": "dahai", "actor": 0, "pai": "P", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "P"}
+{"type": "dahai", "actor": 1, "pai": "P", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "P"}
+{"type": "dahai", "actor": 2, "pai": "P", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "3p"}
+{"type": "dahai", "actor": 3, "pai": "3p", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "6m"}
+{"type": "dahai", "actor": 0, "pai": "6m", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "1s"}
+{"type": "dahai", "actor": 1, "pai": "7m", "tsumogiri": false}
+{"type": "hora", "actor": 3, "target": 1, "pai": "7m", "hora_tehais": ["3m", "4m", "5m", "8m", "9m", "4p", "4p", "7p", "8p", "9p", "6s", "7s", "8s"], "uradora_markers": ["4p"], "yakus": [["reach", 1]], "fu": 40, "fan": 1, "hora_points": 1300, "deltas": [0, -1300, 0, 2300], "scores": [25000, 23700, 25000, 26300]}
+{"type": "end_kyoku"}
+{"type": "start_kyoku", "bakaze": "E", "kyoku": 2, "honba": 0, "kyotaku": 0, "oya": 1, "dora_marker": "9s", "tehais": [["5p", "3s", "N", "4p", "8m", "1p", "4p", "5pr", "8p", "6m", "E", "5s", "3p"], ["8s", "9m", "6m", "1s", "7m", "2m", "7m", "3m", "S", "2s", "3s", "9s", "N"], ["7p", "4m", "6s", "4m", "3m", "E", "5sr", "9m", "4s", "7s", "9p", "2m", "1s"], ["N", "3m", "9p", "9m", "9p", "7m", "6s", "5mr", "P", "1p", "8m", "2p", "4p"]]}
+{"type": "tsumo", "actor": 0, "pai": "3p"}
+{"type": "dahai", "actor": 0, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "7s"}
+{"type": "dahai", "actor": 1, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "5m"}
+{"type": "dahai", "actor": 2, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "2p"}
+{"type": "dahai", "actor": 3, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "E"}
+{"type": "dahai", "actor": 0, "pai": "1p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "5m"}
+{"type": "dahai", "actor": 1, "pai": "S", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "8p"}
+{"type": "dahai", "actor": 2, "pai": "1s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "N"}
+{"type": "dahai", "actor": 3, "pai": "N", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "W"}
+{"type": "dahai", "actor": 0, "pai": "W", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "5s"}
+{"type": "dahai", "actor": 1, "pai": "5s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "S"}
+{"type": "dahai", "actor": 2, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "F"}
+{"type": "dahai", "actor": 3, "pai": "P", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "9m"}
+{"type": "dahai", "actor": 0, "pai": "9m", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "7s"}
+{"type": "dahai", "actor": 1, "pai": "7s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "2m"}
+{"type": "dahai", "actor": 2, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "F"}
+{"type": "dahai", "actor": 3, "pai": "1p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "7p"}
+{"type": "dahai", "actor": 0, "pai": "8m", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "F"}
+{"type": "dahai", "actor": 1, "pai": "F", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "4m"}
+{"type": "reach", "actor": 2}
+{"type": "dahai", "actor": 2, "pai": "7s", "tsumogiri": false}
+{"type": "reach_accepted", "actor": 2, "deltas": [0, 0, -1000, 0], "scores": [25000, 23700, 24000, 26300]}
+{"type": "tsumo", "actor": 3, "pai": "6p"}
+{"type": "dahai", "actor": 3, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "5p"}
+{"type": "dahai", "actor": 0, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "1m"}
+{"type": "reach", "actor": 1}
+{"type": "dahai", "actor": 1, "pai": "9m", "tsumogiri": false}
+{"type": "reach_accepted", "actor": 1, "deltas": [0, -1000, 0, 0], "scores": [25000, 22700, 24000, 26300]}
+{"type": "tsumo", "actor": 2, "pai": "8p"}
+{"type": "dahai", "actor": 2, "pai": "8p", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "2p"}
+{"type": "dahai", "actor": 3, "pai": "F", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "4s"}
+{"type": "dahai", "actor": 0, "pai": "8p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "8s"}
+{"type": "dahai", "actor": 1, "pai": "8s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "8m"}
+{"type": "dahai", "actor": 2, "pai": "8m", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "P"}
+{"type": "dahai", "actor": 3, "pai": "F", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "1p"}
+{"type": "dahai", "actor": 0, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "W"}
+{"type": "dahai", "actor": 1, "pai": "W", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "2p"}
+{"type": "dahai", "actor": 2, "pai": "2p", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "C"}
+{"type": "dahai", "actor": 3, "pai": "2p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "1s"}
+{"type": "dahai", "actor": 0, "pai": "5pr", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "8m"}
+{"type": "dahai", "actor": 1, "pai": "8m", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "2m"}
+{"type": "hora", "actor": 2, "target": 2, "pai": "2m", "hora_tehais": ["2m", "2m", "3m", "4m", "4m", "4m", "5m", "7p", "8p", "9p", "4s", "5sr", "6s", "2m"], "uradora_markers": ["8s"], "yakus": [["akadora", 1], ["reach", 1], ["menzenchin_tsumoho", 1]], "fu": 30, "fan": 3, "hora_points": 4000, "deltas": [-1000, -2000, 6000, -1000], "scores": [24000, 20700, 30000, 25300]}
+{"type": "end_kyoku"}
+{"type": "start_kyoku", "bakaze": "E", "kyoku": 3, "honba": 0, "kyotaku": 0, "oya": 2, "dora_marker": "7p", "tehais": [["4m", "9p", "9p", "4m", "7p", "8s", "4m", "7s", "8p", "6p", "9m", "N", "S"], ["P", "1m", "8p", "2p", "4s", "3p", "C", "4s", "8p", "7s", "E", "2m", "5m"], ["P", "2s", "9s", "C", "1s", "2p", "9m", "6m", "3s", "4p", "N", "4p", "N"], ["8s", "S", "3s", "6m", "F", "5p", "9p", "E", "6p", "5p", "5m", "5pr", "7m"]]}
+{"type": "tsumo", "actor": 0, "pai": "P"}
+{"type": "dahai", "actor": 0, "pai": "P", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "8m"}
+{"type": "dahai", "actor": 1, "pai": "P", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "1s"}
+{"type": "dahai", "actor": 2, "pai": "P", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "9m"}
+{"type": "dahai", "actor": 3, "pai": "S", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "5sr"}
+{"type": "dahai", "actor": 0, "pai": "S", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "1s"}
+{"type": "dahai", "actor": 1, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "2m"}
+{"type": "dahai", "actor": 2, "pai": "C", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "1p"}
+{"type": "dahai", "actor": 3, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "2p"}
+{"type": "dahai", "actor": 0, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "N"}
+{"type": "dahai", "actor": 1, "pai": "N", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "4p"}
+{"type": "dahai", "actor": 2, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "1m"}
+{"type": "dahai", "actor": 3, "pai": "F", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "1m"}
+{"type": "dahai", "actor": 0, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "C"}
+{"type": "dahai", "actor": 1, "pai": "1s", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "3p"}
+{"type": "dahai", "actor": 2, "pai": "9s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "4s"}
+{"type": "dahai", "actor": 3, "pai": "9p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "7s"}
+{"type": "dahai", "actor": 0, "pai": "1m", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "1p"}
+{"type": "dahai", "actor": 1, "pai": "8m", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "8s"}
+{"type": "dahai", "actor": 2, "pai": "2m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "4m"}
+{"type": "dahai", "actor": 3, "pai": "1m", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "6s"}
+{"type": "reach", "actor": 0}
+{"type": "dahai", "actor": 0, "pai": "2p", "tsumogiri": false}
+{"type": "reach_accepted", "actor": 0, "deltas": [-1000, 0, 0, 0], "scores": [23000, 20700, 30000, 25300]}
+{"type": "tsumo", "actor": 1, "pai": "5s"}
+{"type": "dahai", "actor": 1, "pai": "1m", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "2p"}
+{"type": "dahai", "actor": 2, "pai": "2p", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "1p"}
+{"type": "dahai", "actor": 3, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "6s"}
+{"type": "hora", "actor": 0, "target": 0, "pai": "6s", "hora_tehais": ["4m", "4m", "4m", "6p", "7p", "8p", "9p", "9p", "5sr", "6s", "7s", "7s", "8s", "6s"], "uradora_markers": ["W"], "yakus": [["dora", 1], ["akadora", 1], ["reach", 1], ["ippatsu", 1], ["menzenchin_tsumoho", 1]], "fu": 30, "fan": 5, "hora_points": 8000, "deltas": [9000, -2000, -4000, -2000], "scores": [32000, 18700, 26000, 23300]}
+{"type": "end_kyoku"}
+{"type": "start_kyoku", "bakaze": "E", "kyoku": 4, "honba": 0, "kyotaku": 0, "oya": 3, "dora_marker": "9s", "tehais": [["7s", "P", "7p", "1m", "1m", "7p", "1p", "8s", "2p", "2p", "9m", "N", "8s"], ["5mr", "3p", "C", "2m", "6m", "9s", "8p", "9p", "S", "9p", "4s", "9m", "3p"], ["4s", "6p", "4m", "7p", "1m", "8p", "6m", "1s", "5s", "N", "5pr", "9m", "1p"], ["6p", "7m", "4p", "C", "6m", "6m", "2m", "F", "N", "3m", "E", "9m", "3p"]]}
+{"type": "tsumo", "actor": 0, "pai": "8p"}
+{"type": "dahai", "actor": 0, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "3s"}
+{"type": "dahai", "actor": 1, "pai": "C", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "1m"}
+{"type": "dahai", "actor": 2, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "8m"}
+{"type": "dahai", "actor": 3, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "1p"}
+{"type": "dahai", "actor": 0, "pai": "P", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "6p"}
+{"type": "dahai", "actor": 1, "pai": "S", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "2s"}
+{"type": "dahai", "actor": 2, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "7p"}
+{"type": "dahai", "actor": 3, "pai": "C", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "W"}
+{"type": "dahai", "actor": 0, "pai": "W", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "1s"}
+{"type": "dahai", "actor": 1, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "5m"}
+{"type": "dahai", "actor": 2, "pai": "1p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "1p"}
+{"type": "dahai", "actor": 3, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "4p"}
+{"type": "dahai", "actor": 0, "pai": "4p", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "1s"}
+{"type": "dahai", "actor": 1, "pai": "9s", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "7s"}
+{"type": "dahai", "actor": 2, "pai": "1s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "9p"}
+{"type": "dahai", "actor": 3, "pai": "F", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "P"}
+{"type": "dahai", "actor": 0, "pai": "P", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "4m"}
+{"type": "dahai", "actor": 1, "pai": "6p", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "2p"}
+{"type": "dahai", "actor": 2, "pai": "2p", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "3m"}
+{"type": "dahai", "actor": 3, "pai": "1p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "7m"}
+{"type": "dahai", "actor": 0, "pai": "1p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "2s"}
+{"type": "dahai", "actor": 1, "pai": "2m", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "1s"}
+{"type": "dahai", "actor": 2, "pai": "1s", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "7m"}
+{"type": "dahai", "actor": 3, "pai": "9p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "3p"}
+{"type": "dahai", "actor": 0, "pai": "2p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "9p"}
+{"type": "reach", "actor": 1}
+{"type": "dahai", "actor": 1, "pai": "8p", "tsumogiri": false}
+{"type": "reach_accepted", "actor": 1, "deltas": [0, -1000, 0, 0], "scores": [32000, 17700, 26000, 23300]}
+{"type": "tsumo", "actor": 2, "pai": "5p"}
+{"type": "dahai", "actor": 2, "pai": "8p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "S"}
+{"type": "dahai", "actor": 3, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "P"}
+{"type": "dahai", "actor": 0, "pai": "8p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "E"}
+{"type": "dahai", "actor": 1, "pai": "E", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "4s"}
+{"type": "dahai", "actor": 2, "pai": "6p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "5p"}
+{"type": "dahai", "actor": 3, "pai": "2m", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "8p"}
+{"type": "dahai", "actor": 0, "pai": "8p", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "8m"}
+{"type": "dahai", "actor": 1, "pai": "8m", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "5sr"}
+{"type": "dahai", "actor": 2, "pai": "5m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "2m"}
+{"type": "dahai", "actor": 3, "pai": "2m", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "W"}
+{"type": "dahai", "actor": 0, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "9s"}
+{"type": "dahai", "actor": 1, "pai": "9s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "4s"}
+{"type": "dahai", "actor": 2, "pai": "7p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "6s"}
+{"type": "dahai", "actor": 3, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "3s"}
+{"type": "dahai", "actor": 0, "pai": "7p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "S"}
+{"type": "dahai", "actor": 1, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "F"}
+{"type": "dahai", "actor": 2, "pai": "F", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "2p"}
+{"type": "reach", "actor": 3}
+{"type": "dahai", "actor": 3, "pai": "6s", "tsumogiri": false}
+{"type": "reach_accepted", "actor": 3, "deltas": [0, 0, 0, -1000], "scores": [32000, 17700, 26000, 22300]}
+{"type": "tsumo", "actor": 0, "pai": "F"}
+{"type": "dahai", "actor": 0, "pai": "F", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "7s"}
+{"type": "dahai", "actor": 1, "pai": "7s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "4m"}
+{"type": "dahai", "actor": 2, "pai": "7s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "2s"}
+{"type": "dahai", "actor": 3, "pai": "2s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "5m"}
+{"type": "dahai", "actor": 0, "pai": "7s", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "N"}
+{"type": "dahai", "actor": 1, "pai": "N", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "2s"}
+{"type": "dahai", "actor": 2, "pai": "2s", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "5s"}
+{"type": "dahai", "actor": 3, "pai": "5s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "P"}
+{"type": "dahai", "actor": 0, "pai": "W", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "W"}
+{"type": "dahai", "actor": 1, "pai": "W", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "8m"}
+{"type": "dahai", "actor": 2, "pai": "2s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "6p"}
+{"type": "dahai", "actor": 3, "pai": "6p", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "6s"}
+{"type": "dahai", "actor": 0, "pai": "6s", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "S"}
+{"type": "dahai", "actor": 1, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "7s"}
+{"type": "dahai", "actor": 2, "pai": "5s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "5s"}
+{"type": "dahai", "actor": 3, "pai": "5s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "C"}
+{"type": "dahai", "actor": 0, "pai": "C", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "3s"}
+{"type": "dahai", "actor": 1, "pai": "3s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "5p"}
+{"type": "dahai", "actor": 2, "pai": "5sr", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "6s"}
+{"type": "dahai", "actor": 3, "pai": "6s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "C"}
+{"type": "dahai", "actor": 0, "pai": "C", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "E"}
+{"type": "dahai", "actor": 1, "pai": "E", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "5m"}
+{"type": "dahai", "actor": 2, "pai": "7s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "4m"}
+{"type": "dahai", "actor": 3, "pai": "4m", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "6s"}
+{"type": "dahai", "actor": 0, "pai": "6s", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "9s"}
+{"type": "dahai", "actor": 1, "pai": "9s", "tsumogiri": true}
+{"type": "ryukyoku", "reason": "fanpai", "tehais": [["1m", "1m", "5m", "7m", "1p", "2p", "3p", "7p", "3s", "8s", "8s", "P", "P"], ["4m", "5mr", "6m", "3p", "3p", "9p", "9p", "9p", "1s", "1s", "2s", "3s", "4s"], ["1m", "1m", "4m", "4m", "5m", "6m", "8m", "5p", "5p", "5pr", "4s", "4s", "4s"], ["3m", "3m", "6m", "6m", "7m", "7m", "8m", "2p", "3p", "4p", "5p", "6p", "7p"]], "tenpais": [false, true, false, true], "deltas": [-1500, 1500, -1500, 1500], "scores": [30500, 19200, 24500, 23800]}
+{"type": "end_kyoku"}
+{"type": "start_kyoku", "bakaze": "E", "kyoku": 4, "honba": 1, "kyotaku": 2, "oya": 3, "dora_marker": "9p", "tehais": [["1p", "6p", "5p", "P", "6s", "C", "1m", "7s", "8p", "2p", "2p", "3p", "8s"], ["3m", "N", "6m", "4m", "7p", "2s", "E", "1p", "E", "9m", "3m", "6m", "5s"], ["P", "7s", "5s", "5m", "1m", "3p", "7m", "9p", "9p", "1s", "7m", "9s", "4m"], ["7p", "7m", "3p", "N", "S", "3s", "9m", "S", "2m", "7m", "4s", "8m", "5m"]]}
+{"type": "tsumo", "actor": 0, "pai": "4p"}
+{"type": "dahai", "actor": 0, "pai": "P", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "6m"}
+{"type": "dahai", "actor": 1, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "8p"}
+{"type": "dahai", "actor": 2, "pai": "P", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "9s"}
+{"type": "dahai", "actor": 3, "pai": "N", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "2m"}
+{"type": "dahai", "actor": 0, "pai": "C", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "7p"}
+{"type": "dahai", "actor": 1, "pai": "2s", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "P"}
+{"type": "dahai", "actor": 2, "pai": "P", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "6s"}
+{"type": "dahai", "actor": 3, "pai": "9s", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "8s"}
+{"type": "dahai", "actor": 0, "pai": "2p", "tsumogiri": false}
+{"type": "tsumo", "actor": 1, "pai": "1m"}
+{"type": "dahai", "actor": 1, "pai": "1p", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "4s"}
+{"type": "dahai", "actor": 2, "pai": "1m", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "9s"}
+{"type": "dahai", "actor": 3, "pai": "9s", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "5s"}
+{"type": "reach", "actor": 0}
+{"type": "dahai", "actor": 0, "pai": "8p", "tsumogiri": false}
+{"type": "reach_accepted", "actor": 0, "deltas": [-1000, 0, 0, 0], "scores": [29500, 19200, 24500, 23800]}
+{"type": "tsumo", "actor": 1, "pai": "E"}
+{"type": "dahai", "actor": 1, "pai": "E", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "3s"}
+{"type": "dahai", "actor": 2, "pai": "8p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "C"}
+{"type": "dahai", "actor": 3, "pai": "C", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "9m"}
+{"type": "dahai", "actor": 0, "pai": "9m", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "8m"}
+{"type": "dahai", "actor": 1, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "3p"}
+{"type": "dahai", "actor": 2, "pai": "9p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "9m"}
+{"type": "dahai", "actor": 3, "pai": "9m", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "2s"}
+{"type": "dahai", "actor": 0, "pai": "2s", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "4s"}
+{"type": "dahai", "actor": 1, "pai": "E", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "5pr"}
+{"type": "dahai", "actor": 2, "pai": "9p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "5p"}
+{"type": "dahai", "actor": 3, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "1p"}
+{"type": "dahai", "actor": 0, "pai": "1p", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "8m"}
+{"type": "dahai", "actor": 1, "pai": "9m", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "4m"}
+{"type": "dahai", "actor": 2, "pai": "5pr", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "F"}
+{"type": "dahai", "actor": 3, "pai": "5p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "S"}
+{"type": "dahai", "actor": 0, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "N"}
+{"type": "dahai", "actor": 1, "pai": "N", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "8s"}
+{"type": "dahai", "actor": 2, "pai": "5s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "1p"}
+{"type": "dahai", "actor": 3, "pai": "S", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "9p"}
+{"type": "dahai", "actor": 0, "pai": "9p", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "8p"}
+{"type": "dahai", "actor": 1, "pai": "8p", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "7p"}
+{"type": "dahai", "actor": 2, "pai": "8s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "7s"}
+{"type": "dahai", "actor": 3, "pai": "S", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "4p"}
+{"type": "dahai", "actor": 0, "pai": "4p", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "4p"}
+{"type": "dahai", "actor": 1, "pai": "4p", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "2m"}
+{"type": "dahai", "actor": 2, "pai": "7p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "3m"}
+{"type": "dahai", "actor": 3, "pai": "7p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "9s"}
+{"type": "dahai", "actor": 0, "pai": "9s", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "1m"}
+{"type": "dahai", "actor": 1, "pai": "7p", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "C"}
+{"type": "dahai", "actor": 2, "pai": "C", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "4m"}
+{"type": "dahai", "actor": 3, "pai": "1p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "2s"}
+{"type": "dahai", "actor": 0, "pai": "2s", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "5mr"}
+{"type": "dahai", "actor": 1, "pai": "7p", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "5p"}
+{"type": "dahai", "actor": 2, "pai": "5p", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "5m"}
+{"type": "dahai", "actor": 3, "pai": "F", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "1s"}
+{"type": "dahai", "actor": 0, "pai": "1s", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "2p"}
+{"type": "dahai", "actor": 1, "pai": "2p", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "6p"}
+{"type": "dahai", "actor": 2, "pai": "1s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "6p"}
+{"type": "dahai", "actor": 3, "pai": "6p", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "F"}
+{"type": "dahai", "actor": 0, "pai": "F", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "8s"}
+{"type": "dahai", "actor": 1, "pai": "8s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "3s"}
+{"type": "dahai", "actor": 2, "pai": "6p", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "6p"}
+{"type": "dahai", "actor": 3, "pai": "6p", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "4p"}
+{"type": "dahai", "actor": 0, "pai": "4p", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "W"}
+{"type": "dahai", "actor": 1, "pai": "5s", "tsumogiri": false}
+{"type": "tsumo", "actor": 2, "pai": "2s"}
+{"type": "dahai", "actor": 2, "pai": "9s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "N"}
+{"type": "dahai", "actor": 3, "pai": "N", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "2p"}
+{"type": "dahai", "actor": 0, "pai": "2p", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "1s"}
+{"type": "dahai", "actor": 1, "pai": "1s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "6m"}
+{"type": "dahai", "actor": 2, "pai": "2s", "tsumogiri": false}
+{"type": "tsumo", "actor": 3, "pai": "4s"}
+{"type": "dahai", "actor": 3, "pai": "3p", "tsumogiri": false}
+{"type": "tsumo", "actor": 0, "pai": "E"}
+{"type": "dahai", "actor": 0, "pai": "E", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "1s"}
+{"type": "dahai", "actor": 1, "pai": "1s", "tsumogiri": true}
+{"type": "tsumo", "actor": 2, "pai": "8p"}
+{"type": "dahai", "actor": 2, "pai": "8p", "tsumogiri": true}
+{"type": "tsumo", "actor": 3, "pai": "S"}
+{"type": "dahai", "actor": 3, "pai": "S", "tsumogiri": true}
+{"type": "tsumo", "actor": 0, "pai": "3s"}
+{"type": "dahai", "actor": 0, "pai": "3s", "tsumogiri": true}
+{"type": "tsumo", "actor": 1, "pai": "3m"}
+{"type": "dahai", "actor": 1, "pai": "W", "tsumogiri": false}
+{"type": "ryukyoku", "reason": "fanpai", "tehais": [["1m", "2m", "1p", "2p", "3p", "4p", "5p", "6p", "5s", "6s", "7s", "8s", "8s"], ["1m", "1m", "3m", "3m", "3m", "4m", "5mr", "6m", "6m", "6m", "8m", "8m", "4s"], ["2m", "4m", "4m", "5m", "6m", "7m", "7m", "3p", "3p", "3s", "3s", "4s", "7s"], ["2m", "3m", "4m", "5m", "5m", "7m", "7m", "8m", "3s", "4s", "4s", "6s", "7s"]], "tenpais": [true, false, false, false], "deltas": [3000, -1000, -1000, -1000], "scores": [32500, 18200, 23500, 22800]}
+{"type": "end_kyoku"}
+{"type": "end_game"}
