@@ -2,3 +2,5 @@ mlruns
 .vscode
 __pycache__
 outputs
+experiments
+*.mjson
