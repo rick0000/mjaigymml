@@ -1,9 +1,10 @@
 numpy
 joblib
 dataclasses
-git+https://github.com/rick0000/mjaigym.git@develop
 black
 flake8
 autopep8
 mypy
 mlflow
+pyyaml
+git+https://github.com/rick0000/mjaigym.git@develop

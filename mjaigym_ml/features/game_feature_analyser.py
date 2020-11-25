@@ -8,22 +8,29 @@ from mjaigym.mjson import Mjson
 from mjaigym.board.board_state import BoardState
 from .game_feature_analysis import GameFeatureAnalysis
 from mjaigym.board.archive_board import ArchiveBoard
+from .extractor_config import ExtractorConfig
 
 class GameFeatureAnalyser():
     """
     ゲーム解析情報（mjsonクラス）をもとにGameFeatureAnalysisを作成する。
     """
 
-    def __init__(self, feature_extractor_config:Dict):
-        self.feature_extractor_config = feature_extractor_config
-        self.feature_extractors = []
+    def __init__(self, extractor_config:ExtractorConfig):
+        self.extractor_config = extractor_config
+        self.reach_dahai_extractors = []
+        self.pon_chi_kan_extractors = []
 
         # configで指定された特徴量抽出クラスをimportする
-        for module_name, target_class_name in self.feature_extractor_config.items():            
+        for module_name, target_class_name in self.extractor_config.on_reach_dahai.items():
             target_module = importlib.import_module(f"mjaigym_ml.features.custom.{module_name}")
             target_class = getattr(target_module, target_class_name)
-            self.feature_extractors.append(target_class)
-        
+            self.reach_dahai_extractors.append(target_class)
+
+        for module_name, target_class_name in self.extractor_config.on_pon_chi_kan.items():
+            target_module = importlib.import_module(f"mjaigym_ml.features.custom.{module_name}")
+            target_class = getattr(target_module, target_class_name)
+            self.pon_chi_kan_extractors.append(target_class)
+
 
     def analyze_list(self, mjson_list:List[Dict])->GameFeatureAnalysis:
         """
@@ -56,19 +63,26 @@ class GameFeatureAnalyser():
                 board.step(action)
                 state = board.get_state()
 
-                # check need to calclate feature
-                # if all flag is false, skip calclate.
-                if self._need_calclate(state):
-                    feature = self.feature_extractors
+                # それぞれのモデルの学習対象局面でない行はスキップ
+                if not self._need_calclate(state):
+                    continue
                 
-                next_action = None if line_index == len(kyoku.kyoku_mjsons) \
-                    else kyoku.kyoku_mjsons[line_index+1]
+                if line_index+1 >= len(kyoku.kyoku_mjsons):
+                    continue
                 
+                # 次のアクションを取得
+                next_action = kyoku.kyoku_mjsons[line_index+1]
+
+                # どのモデルの学習対象かチェック
                 dahai, reach, pon, chi, kan = \
                     self._possible_action_types(state, next_action)
 
-                # calclate feature for each possible actions
-                feature = None                
+                # 特徴量を計算
+                feature = None
+
+                # 副露特徴量を計算
+                furo_feature = None
+
 
             line_count += len(kyoku.kyoku_mjsons)
         
@@ -76,27 +90,27 @@ class GameFeatureAnalyser():
             Path(mjson.path), 
             labels, 
             features, 
-            self.feature_extractor_config)
+            self.extractor_config)
         return analysis
 
 
-    def _need_calclate(state:BoardState):
-        if all([len(actions) == 1 for actions in state.possible_actions]):
+    def _need_calclate(self, state:BoardState):
+        if all([len(actions) == 1 for actions in state.possible_actions.values()]):
             return False
         return True
 
-    def _possible_action_types(state:BoardState, next_action:Dict):
+    def _possible_action_types(self, state:BoardState, next_action:Dict):
         dahai = False
         reach = False
         pon = False
         chi = False
         kan = False
         
-        if next_action["type"] == "dahai" and (not state.reachs[next_action["actor"]]):
+        if next_action["type"] == "dahai" and (not state.reach[next_action["actor"]]):
             dahai = True
 
         # other check
-        for player_actions in state.possible_actions:
+        for player_actions in state.possible_actions.values():
             for action in player_actions:
                 if action["type"] == "reach":
                     reach = True
