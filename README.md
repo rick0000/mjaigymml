@@ -79,3 +79,10 @@ python reinforcement_train.py \
     --output_dir <モデルファイルを保存するディレクトリのパス> \
 
 ```
+
+
+# 
+データ保存形式
+* ラベルデータ＆メタデータ:csv
+* 特徴量:numpy.array
+

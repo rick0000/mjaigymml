@@ -8,3 +8,4 @@ mypy
 mlflow
 pyyaml
 git+https://github.com/rick0000/mjaigym.git@develop
+h5py
