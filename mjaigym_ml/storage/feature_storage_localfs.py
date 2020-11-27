@@ -13,6 +13,10 @@ class FeatureStorageLocalFs():
         self.label_dir_path.mkdir(parents=True, exist_ok=True)
 
     def save(self, fname, feature: Dict[str, np.array], label: pd.DataFrame):
+        if len(label) == 0:
+            print("ignore no record dataset, not saved.")
+            return 
+        
         fname = Path(fname)
         label_path = self.label_dir_path / f"{fname}.csv.gz"
         label_path.parent.mkdir(parents=True, exist_ok=True)

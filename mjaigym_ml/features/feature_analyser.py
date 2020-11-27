@@ -43,6 +43,9 @@ class FeatureAnalyser():
             assert isinstance(class_instance, FeaturePonChiKan)
             self.pon_chi_kan_extractors.append(class_instance)
 
+        self.reach_dahai_length = sum([f.get_length() for f in self.reach_dahai_extractors])
+        self.pon_chi_kan_length = sum([f.get_length() for f in self.pon_chi_kan_extractors])
+
     def reset_extractor_state(self):
         """
         キャッシュなど内部状態のリセット
@@ -76,6 +79,8 @@ class FeatureAnalyser():
                 board.step(action)
                 board_state = board.get_state()
 
+                # ファイル上での行数通し番号
+                mjson_line_index = line_count + kyoku_line_index
                 # それぞれのモデルの学習対象局面でない行はスキップ
                 if not self._need_calclate(board_state):
                     continue
@@ -99,7 +104,7 @@ class FeatureAnalyser():
                 # 1状態分の教師データを作成
                 record = LabelRecord(
                     filename=mjson.path.name,
-                    mjson_line_index=line_count + kyoku_line_index,
+                    mjson_line_index=mjson_line_index,
                     kyoku_line_index=kyoku_line_index,
                     kyoku_line_num=len(kyoku.kyoku_mjsons),
                     kyoku_index=kyoku_index,
@@ -134,12 +139,29 @@ class FeatureAnalyser():
 
                     next_action_type=next_action["type"],
                     next_action=next_action,
-
                 )
 
                 labels.append(record)
-                features[f"{kyoku_index}/{kyoku_line_index}"] = \
-                    np.random.randint(0, 2, (4, 250, 34))
+
+                # reach dahai feature
+                reach_dahai_features = np.zeros((4, self.reach_dahai_length, 34))
+                start_index = 0
+                for f in self.reach_dahai_extractors:
+                    feature_name = f.__class__.__name__
+                    for player_id in range(4):
+                        target_array = reach_dahai_features[
+                            player_id,
+                            start_index:start_index+f.get_length(),
+                            :
+                            ]
+                        f.calc(target_array, board_state, player_id)
+                        feature_key = self._get_feature_key(mjson_line_index, feature_name, player_id)
+                        features[feature_key] = target_array
+
+                # pon chi kan feature
+                for player_id in range(4):
+                    feature_key = self._get_feature_key(mjson_line_index, "dummy_feature", player_id)
+                    features[feature_key] = np.random.randint(0,2,(240,34))
 
             line_count += len(kyoku.kyoku_mjsons)
 
@@ -150,6 +172,9 @@ class FeatureAnalyser():
             features,
         )
         return analysis
+
+    def _get_feature_key(self, mjson_line_index, feature_name, player_id):
+        return f"{mjson_line_index}/{feature_name}/{player_id}"
 
     def _need_calclate(self, state: BoardState):
         # 選択可能なアクションが複数ない場合は教師データにならない。

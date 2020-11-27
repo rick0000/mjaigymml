@@ -2,7 +2,8 @@
 
 on_reach_dahai: 
   # すべてのアクションで抽出する特徴量
-  AAAv0.py: AAAv0
+  ankanV0.py: AnkanV0
+  anpaiV0.py: AnpaiV0
 
 on_pon_chi_kan: 
   # ポン、チー、カンのときのみ抽出する特徴量。

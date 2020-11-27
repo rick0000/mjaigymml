@@ -48,9 +48,7 @@ class FeatureAnalysis():
             self,
             fname: Path,
             labels: List[LabelRecord],
-            features: List[Dict[str, np.array]]):
-
-        assert len(labels) == len(features)
+            features: Dict[str, np.array]):
 
         self.fname = fname
         self.labels = pd.DataFrame(data=labels)
