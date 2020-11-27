@@ -1,28 +1,53 @@
+import pdb
+from multiprocessing import Pool
 
-from mjaigym_ml.features.game_feature_analyser import GameFeatureAnalyser
-from mjaigym_ml.features.game_feature_analysis import GameFeatureAnalysis
+from tqdm import tqdm
+
+from mjaigym_ml.features.feature_analyser import FeatureAnalyser
 from mjaigym_ml.storage.local_file_mjson_storage import LocalFileMjsonStorage
-from mjaigym_ml.storage.local_file_mjson_storage import LocalFileMjsonStorage
+from mjaigym_ml.storage.feature_storage_localfs \
+    import FeatureStorageLocalFs
+from mjaigym_ml.features.extract_config import ExtractConfig
+
+
+def analyse_mjson(args):
+    mjson, extractor_config, input_dir, output_dir = args
+    analyser = FeatureAnalyser(extractor_config)
+    feature_storage = FeatureStorageLocalFs(output_dir)
+    game_feature_analysis = analyser.analyse_mjson(mjson)
+    features, labels = game_feature_analysis.get_records()
+    feature_storage.save(mjson.path.name, features, labels)
 
 
 def run(extractor_config, input_dir, output_dir):
-    analyser = GameFeatureAnalyser(extractor_config)
     mjson_storage = LocalFileMjsonStorage(input_dir)
-    feature_storage = LocalFileMjsonStorage(output_dir)
-    
+
     # save config
 
     # analyze feature
-    for mjson in mjson_storage.get_mjsons():
-        game_feature_analysis = analyser.analyse_mjson(mjson)
-        labels, features = game_feature_analysis.get_records()
-        # feature_storage.save(labels, features)
+    all_mjsons = mjson_storage.get_mjsons()
+
+    mjsons = []
+    for i, m in enumerate(all_mjsons):
+        if i == 100:
+            break
+        mjsons.append(m)
+
+    args = [(mjson, extractor_config, input_dir, output_dir)
+            for mjson in mjsons]
+
+    # for arg in tqdm(args):
+    #     analyse_mjson(*arg)
+
+    with Pool(processes=7) as pool:
+        with tqdm(total=len(args)) as t:
+            for _ in pool.imap_unordered(analyse_mjson, args):
+                t.update(1)
 
 
 if __name__ == "__main__":
-    input_dir = "sample_mjson"
-    output_dir = "outputs"
-    config = {
-        "featureAAAv0_0_0":"FeatureAAAv0"
-    }
+    input_dir = "/data/mjson/train/201701"
+    output_dir = "output/extract"
+
+    config = ExtractConfig.load("extract_config.yml")
     run(config, input_dir, output_dir)

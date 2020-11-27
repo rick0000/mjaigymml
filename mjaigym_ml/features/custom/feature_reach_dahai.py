@@ -7,28 +7,30 @@ Returns:
     [type]: [description]
 """
 from abc import ABCMeta, abstractmethod, abstractclassmethod
-from mjaigym.board import BoardState
-from mjaigym.board.function.pai import Pai
-from typing import List, Tuple
-import enum
+
 import numpy as np
-import pprint
-import os
+
+from mjaigym.board import BoardState
 
 
-class Feature(metaclass=ABCMeta):
+class FeatureReachDahai(metaclass=ABCMeta):
     """
     盤面情報をもとに特徴量を計算するクラス
     """
     @abstractclassmethod
-    def get_length(cls)->int:
+    def get_length(cls) -> int:
         raise NotImplementedError()
-        
-    @abstractclassmethod
-    def calc(cls, result:np.array, board_state:BoardState, player_id:int):
+
+    @abstractmethod
+    def calc(self, result: np.array, board_state: BoardState, player_id: int):
         """
         指定されたプレーヤーidについて特徴量計算を行う
         特徴量は 第一引数 result に記録する
         """
         raise NotImplementedError()
 
+    def reset(self):
+        """
+        キャッシュなどを以前計算した状態を再利用している場合はキャッシュリセットを行う
+        """
+        pass

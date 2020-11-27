@@ -1,2 +1,9 @@
-on_pon_chi_kan: {}
-on_reach_dahai: {}
+# ファイル名: クラス名 のように記載する。
+
+on_reach_dahai: 
+  # すべてのアクションで抽出する特徴量
+  AAAv0.py: AAAv0
+
+on_pon_chi_kan: 
+  # ポン、チー、カンのときのみ抽出する特徴量。
+  BBBv0.py: BBBv0
