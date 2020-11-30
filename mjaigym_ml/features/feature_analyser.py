@@ -43,8 +43,10 @@ class FeatureAnalyser():
             assert isinstance(class_instance, FeaturePonChiKan)
             self.pon_chi_kan_extractors.append(class_instance)
 
-        self.reach_dahai_length = sum([f.get_length() for f in self.reach_dahai_extractors])
-        self.pon_chi_kan_length = sum([f.get_length() for f in self.pon_chi_kan_extractors])
+        self.reach_dahai_length = sum(
+            [f.get_length() for f in self.reach_dahai_extractors])
+        self.pon_chi_kan_length = sum(
+            [f.get_length() for f in self.pon_chi_kan_extractors])
 
     def reset_extractor_state(self):
         """
@@ -144,7 +146,8 @@ class FeatureAnalyser():
                 labels.append(record)
 
                 # reach dahai feature
-                reach_dahai_features = np.zeros((4, self.reach_dahai_length, 34))
+                reach_dahai_features = np.zeros(
+                    (4, self.reach_dahai_length, 34))
                 start_index = 0
                 for f in self.reach_dahai_extractors:
                     feature_name = f.__class__.__name__
@@ -153,15 +156,17 @@ class FeatureAnalyser():
                             player_id,
                             start_index:start_index+f.get_length(),
                             :
-                            ]
+                        ]
                         f.calc(target_array, board_state, player_id)
-                        feature_key = self._get_feature_key(mjson_line_index, feature_name, player_id)
+                        feature_key = self._get_feature_key(
+                            mjson_line_index, feature_name, player_id)
                         features[feature_key] = target_array
 
                 # pon chi kan feature
                 for player_id in range(4):
-                    feature_key = self._get_feature_key(mjson_line_index, "dummy_feature", player_id)
-                    features[feature_key] = np.random.randint(0,2,(240,34))
+                    feature_key = self._get_feature_key(
+                        mjson_line_index, "dummy_feature", player_id)
+                    features[feature_key] = np.random.randint(0, 2, (240, 34))
 
             line_count += len(kyoku.kyoku_mjsons)
 
