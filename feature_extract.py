@@ -29,7 +29,7 @@ def run(extractor_config, input_dir, output_dir):
 
     mjsons = []
     for i, m in enumerate(all_mjsons):
-        if i == 1000:
+        if i == 10:
             break
         mjsons.append(m)
 
@@ -39,12 +39,16 @@ def run(extractor_config, input_dir, output_dir):
     # for arg in tqdm(args):
     #     analyse_mjson(*arg)
 
-    cpu_num = multiprocessing.cpu_count()-1
-    # cpu_num = 1
-    with Pool(processes=cpu_num) as pool:
-        with tqdm(total=len(args)) as t:
-            for _ in pool.imap_unordered(analyse_mjson, args):
-                t.update(1)
+    #cpu_num = multiprocessing.cpu_count()-1
+    cpu_num = 1
+    if cpu_num == 1:
+        for arg in tqdm(args):
+            analyse_mjson(arg)
+    else:
+        with Pool(processes=cpu_num) as pool:
+            with tqdm(total=len(args)) as t:
+                for _ in pool.imap_unordered(analyse_mjson, args):
+                    t.update(1)
 
 
 if __name__ == "__main__":
