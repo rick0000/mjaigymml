@@ -8,7 +8,7 @@ from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
 import numpy as np
 
 
-class HorapointDfsV0(FeatureReachDahai):
+class TsumoActorDfsV0(FeatureReachDahai):
 
     target_points = [
         1000,
@@ -125,7 +125,6 @@ class HorapointDfsV0(FeatureReachDahai):
 
             distance = hora_result.hora_path_length
             start_index = (distance-1) * len(YAKU_CHANNEL_MAP)
-            print(distance)
             for yaku, fan in hora_result.get_yakus():
                 if yaku == "dora":
                     fan = fan if fan < 12 else 12
@@ -144,6 +143,6 @@ class HorapointDfsV0(FeatureReachDahai):
                 point_feature_start_index
 
             for point_index, target_point in enumerate(self.target_points):
-                if target_point < hora_result.get_point():
+                if hora_result.get_point() >= target_point:
                     for dahai_id in hora_result.dahaiable_ids:
                         result[start_index + point_index, dahai_id] = 1

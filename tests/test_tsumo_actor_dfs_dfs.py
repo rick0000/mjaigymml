@@ -13,7 +13,7 @@ from mjaigym.board import BoardState
 from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
 
 
-from mjaigym_ml.features.custom.reach_dahai.horapoint_dfsV0 import HorapointDfsV0
+from mjaigym_ml.features.custom.reach_dahai.tsumo_actor_dfsV0 import TsumoActorDfsV0
 
 
 def test_horapoint_dfs():
@@ -39,12 +39,12 @@ def test_horapoint_dfs():
     # 先読み特徴量のテスト
     target_player = state.previous_action['actor']
 
-    extractor = HorapointDfsV0()
+    extractor = TsumoActorDfsV0()
     result = np.zeros((extractor.get_length(), 34))
     board_state = board.get_state()
 
     fixed_tehai = [
-        "1m", "2m", "3m", "4m", "5m", "6m", "7m",  "8m",
+        "1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m",
         "1p", "1p", "1p",
         "E", "E",
         "C",
@@ -68,8 +68,24 @@ def test_horapoint_dfs():
     # （一気通貫、C、あと1枚）の場所にフラグが立っているか
     yaku_target_index = YAKU_CHANNEL_MAP["ikkitsukan"]
     print(yaku_target_index)
-    assert output[yaku_target_index, Pai.from_str("C").id] == 1
-    # （一気通貫、9m、8000点）の場所にフラグが立っているか
+    assert output[
+        yaku_target_index,
+        Pai.from_str("C").id] == 1
+
+    # （一気通貫、E、あと2枚）の場所にフラグが立っているか
+    assert output[
+        yaku_target_index + len(YAKU_CHANNEL_MAP),
+        Pai.from_str("E").id] == 1
+
+    # (8000点, C, あと1枚）の場所にフラグが立っているか
+    point_target_index = extractor.target_points.index(8000)
+    print("point_target_index", point_target_index)
+    print(
+        point_target_index + len(YAKU_CHANNEL_MAP)*extractor.DEPTH,
+        Pai.from_str("C").id)
+    assert output[
+        point_target_index + len(YAKU_CHANNEL_MAP)*extractor.DEPTH,
+        Pai.from_str("C").id] == 1
 
 
 if __name__ == "__main__":
