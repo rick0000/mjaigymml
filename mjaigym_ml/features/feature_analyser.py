@@ -9,6 +9,7 @@ from mjaigym.board.board_state import BoardState
 from mjaigym_ml.features.feature_analysis import FeatureAnalysis
 from mjaigym.board.archive_board import ArchiveBoard
 from .extract_config import ExtractConfig
+from mjaigym_ml.features.custom.feature_common import FeatureCommon
 from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
 from mjaigym_ml.features.custom.feature_pon_chi_kan import FeaturePonChiKan
 from mjaigym_ml.features.feature_analysis import LabelRecord
@@ -21,15 +22,30 @@ class FeatureAnalyser():
 
     def __init__(self, extract_config: ExtractConfig):
         self.extract_config = extract_config
+        self.common_extractors = []
         self.reach_dahai_extractors = []
         self.pon_chi_kan_extractors = []
 
         # configで指定された特徴量抽出クラスをimportする
+        # 共通特徴量のimport
+        for module_name, target_class_name in \
+                self.extract_config.common.items():
+            target_class = self._get_module_class(
+                "common",
+                module_name,
+                target_class_name
+            )
+            class_instance = target_class()
+            assert isinstance(class_instance, FeatureCommon)
+            self.common_extractors.append(class_instance)
+
         # 全アクション用特徴量のimport
         for module_name, target_class_name in \
                 self.extract_config.on_reach_dahai.items():
             target_class = self._get_module_class(
-                module_name, target_class_name)
+                "reach_dahai",
+                module_name,
+                target_class_name)
             class_instance = target_class()
             assert isinstance(class_instance, FeatureReachDahai)
             self.reach_dahai_extractors.append(class_instance)
@@ -38,11 +54,15 @@ class FeatureAnalyser():
         for module_name, target_class_name in \
                 self.extract_config.on_pon_chi_kan.items():
             target_class = self._get_module_class(
-                module_name, target_class_name)
+                "pon_chi_kan",
+                module_name,
+                target_class_name)
             class_instance = target_class()
             assert isinstance(class_instance, FeaturePonChiKan)
             self.pon_chi_kan_extractors.append(class_instance)
 
+        self.common_length = sum(
+            [f.get_length() for f in self.common_extractors])
         self.reach_dahai_length = sum(
             [f.get_length() for f in self.reach_dahai_extractors])
         self.pon_chi_kan_length = sum(
@@ -52,6 +72,8 @@ class FeatureAnalyser():
         """
         キャッシュなど内部状態のリセット
         """
+        for extractor in self.common_extractors:
+            extractor.reset()
         for extractor in self.reach_dahai_extractors:
             extractor.reset()
         for extractor in self.pon_chi_kan_extractors:
@@ -145,6 +167,22 @@ class FeatureAnalyser():
 
                 labels.append(record)
 
+                # common feature
+                common_features = np.zeros(
+                    (1, self.common_length, 34))
+                start_index = 0
+                for f in self.common_extractors:
+                    feature_name = f.__class__.__name__
+                    target_array = common_features[
+                        0,
+                        start_index:start_index+f.get_length(),
+                        :
+                    ]
+                    f.calc(target_array, board_state)
+                    feature_key = self._get_feature_key(
+                        mjson_line_index, feature_name, 0)
+                    features[feature_key] = target_array
+
                 # reach dahai feature
                 reach_dahai_features = np.zeros(
                     (4, self.reach_dahai_length, 34))
@@ -178,8 +216,11 @@ class FeatureAnalyser():
         )
         return analysis
 
-    def _get_feature_key(self, mjson_line_index, feature_name, player_id):
-        return f"{mjson_line_index}/{feature_name}/{player_id}"
+    def _get_feature_key(self, mjson_line_index, feature_name, player_id=None):
+        if player_id is None:
+            return f"{mjson_line_index}/{feature_name}"
+        else:
+            return f"{mjson_line_index}/{feature_name}/{player_id}"
 
     def _need_calclate(self, state: BoardState):
         # 選択可能なアクションが複数ない場合は教師データにならない。
@@ -213,10 +254,10 @@ class FeatureAnalyser():
 
         return dahai, reach, pon, chi, kan
 
-    def _get_module_class(self, module_name, target_class_name):
+    def _get_module_class(self, dir_name, module_name, target_class_name):
         target_module_name = self._filter_dotpy(module_name)
         target_module = importlib.import_module(
-            f"mjaigym_ml.features.custom.{target_module_name}")
+            f"mjaigym_ml.features.custom.{dir_name}.{target_module_name}")
         target_class = getattr(target_module, target_class_name)
         return target_class
 

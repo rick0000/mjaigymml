@@ -1,10 +1,9 @@
-from abc import abstractmethod, abstractclassmethod
 import numpy as np
-from .feature_reach_dahai import FeatureReachDahai
+from mjaigym_ml.features.custom.feature_pon_chi_kan import FeaturePonChiKan
 from mjaigym.board.board_state import BoardState
 
 
-class AAAv0(FeatureReachDahai):
+class BBBV0(FeaturePonChiKan):
     @classmethod
     def get_length(cls):
         return 1

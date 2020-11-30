@@ -1,10 +1,10 @@
 import numpy as np
 
-from mjaigym_ml.features.custom.feature import Feature
+from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
 from mjaigym.board import BoardState
 
 
-class BakazeV0(Feature):
+class BakazeV0(FeatureReachDahai):
 
     def get_length(cls) -> int:
         return 1

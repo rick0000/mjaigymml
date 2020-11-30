@@ -1,10 +1,10 @@
 import numpy as np
 
-from mjaigym_ml.features.custom.feature import Feature
+from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
 from mjaigym.board import BoardState
 
 
-class DiscardReachStateV0(Feature):
+class DiscardReachStateV0(FeatureReachDahai):
 
     def get_length(cls) -> int:
         return 24
