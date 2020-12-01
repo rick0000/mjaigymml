@@ -178,7 +178,7 @@ class FeatureAnalyser():
                             mjson_line_index, feature_name, 0)
                         features[feature_key] = target_array
 
-                if reach:
+                
 
                 # 副露特徴量を計算
                 reach_dahai_features = np.zeros(
@@ -217,7 +217,7 @@ class FeatureAnalyser():
                                 feature_key = self._get_feature_key(
                                     mjson_line_index, feature_name, player_id)
                                 features[feature_key] = target_array
-
+                """
             line_count += len(kyoku.kyoku_mjsons)
 
         # 作成した1ゲーム分のデータをまとめる

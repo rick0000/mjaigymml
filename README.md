@@ -8,11 +8,8 @@
 
 ## 機能
 1. 教師あり学習
-    * 特徴量抽出機能  
-        牌譜から特徴量を計算しファイルに保存します。
-
     * 教師あり学習機能  
-        保存した特徴量をもとに機械学習モデルの学習を行います。
+        牌譜をもとに機械学習モデルの学習を行います。
 
 2. 強化学習
     * 強化学習機能  
@@ -20,7 +17,7 @@
 
 3. 評価
     * 一致度評価機能  
-        牌譜の内容と機械学習モデルの予測の一致度を計算します。
+        牌譜と機械学習モデルの予測の一致度を計算します。
 
     * 強さ評価機能  
         対戦を行い機械学習モデルの強さの評価を行います。
@@ -34,31 +31,20 @@
 * 教師あり学習
 
 ```
-# 学習用特徴量抽出
-python feature_extract.py \
-    --mjson_dir <学習用mjson牌譜ファイルのフォルダ> \
-    --feature_dir <特徴量出力フォルダ> \
-    --extract_config <特徴量抽出コンフィグファイルのパス>
-
-# テスト用用特徴量抽出
-python feature_extract.py \
-    --mjson_dir <テスト用mjson牌譜ファイルのフォルダ> \
-    --feature_dir <特徴量出力フォルダ> \
-    --game_num <解析するファイル数上限> \
-    --extract_config <特徴量抽出コンフィグファイルのパス>
-
 # 学習
 python supervised_train.py \
-    --train_feature_dir <学習用特徴量フォルダ> \
-    --test_train_dir <テスト用特徴量フォルダ> \
+    --model_type <学習するモデルの種類(dahai, reach, pon, chi, kan)> \
+    --train_mjson_dir <学習用牌譜フォルダ> \
+    --test_mjson_dir <テスト用牌譜フォルダ> \
+    --extract_config <特徴量抽出コンフィグファイルのパス> \
     --model_config <モデル構成コンフィグファイルのパス> \
     --train_config <学習用パラメータコンフィグファイルのパス> \
-    --output_dir <モデルファイルを保存するディレクトリのパス> \
-    --model_type <学習するモデルの種類(dahai, reach, pon, chi, kan)> \
+    --model_save_dir <モデルファイルを保存するディレクトリのパス> \
     --model_dir <[option]既存モデルファイルが保存されているディレクトリのパス>
     
 # 精度評価
 python evaluate_accuracy.py \
+    --test_mjson_dir <テスト用特徴量フォルダ> \
     --extract_config <特徴量抽出コンフィグファイルのパス> \
     --model_config <モデル構成コンフィグファイルのパス> \
     --model_type <評価するモデルの種類(dahai, reach, pon, chi, kan)> \
