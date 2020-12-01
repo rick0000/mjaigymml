@@ -1,35 +1,40 @@
+from typing import Dict
+
+import numpy as np
+
 from mjaigym.board.function.pai import Pai
 from mjaigym.board.function.yaku_name import YAKU_CHANNEL_MAP
 # from mjaigym.board.function.dfs_result import DfsResult
 from mjaigym.board.function.efficient_dfs import Dfs
 from mjaigym.board.function.rs_shanten_analysis import RsShantenAnalysis
 from mjaigym.board import BoardState
-from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
-import numpy as np
+from mjaigym_ml.features.custom.feature_pon_chi_kan import FeaturePonChiKan
 
 
-class TsumoActorDfsV0(FeatureReachDahai):
+class PonChiKanDfsV0(FeaturePonChiKan):
+    """
+    先読み特徴量。
+    ポン、チー、カン候補に対してアクションを適用した場合を仮定して
+    深さ優先探索を行い、以下の項目についてフラグを立てる
+    1. ある牌を打牌後 DEPTH枚 の牌交換を行った際にある役が和了できるか。
+    2. ある牌を打牌後 DEPTH枚 の牌交換を行った際にある点数が得られるか。
+
+    これらを点数が10パターン、役が50パターンで判定する。
+    DEPTHごとに特徴量を作成する。
+    DEPTH=2の場合は2*(10+50)=120チャネルとなる。
+    """
 
     target_points = [
-        1000,
         1300,
-        1600,
         2000,
-        2400,
         2600,
-        3200,
         3900,
-        4800,
         5200,
         7700,
-        8000,
         12000,
-        16000,
         18000,
         24000,
         32000,
-        36000,
-        48000,
     ]
     DEPTH = 2
 
@@ -42,10 +47,20 @@ class TsumoActorDfsV0(FeatureReachDahai):
         point_ch = len(cls.target_points) * cls.DEPTH
         return yaku_ch + point_ch
 
-    def calc(self, result: np.array, board_state: BoardState, player_id: int):
+    def calc(
+            self,
+            result: np.array,
+            board_state: BoardState,
+            player_id: int,
+            candidate_furo_action: Dict):
+
+        # アクション候補者と異なる場合は計算しない
+        if candidate_furo_action['actor'] != player_id:
+            return
+
+        # 副露を行ったと仮定して特徴量を計算するため国士無双とチートイツは計算不要
 
         player_tehai = board_state.tehais[player_id]
-
         nums = [0] * 34
         for t in player_tehai:
             nums[t.id] += 1
@@ -53,16 +68,13 @@ class TsumoActorDfsV0(FeatureReachDahai):
 
         player_furos = board_state.furos[player_id]
 
-        # num 14 check
-        if len(player_tehai) + len(player_furos) * 3 != 14:
-            # return
-            pass
+        # 副露適用
+        import pdb
+        pdb.set_trace()
 
         furo_akadora_num = 0
         for furo in player_furos:
             furo_akadora_num += len([p for p in furo.pais if p.is_red])
-
-        # # ignore -1, more than 2
 
         oya = board_state.oya == player_id
         bakaze = board_state.bakaze
@@ -72,7 +84,8 @@ class TsumoActorDfsV0(FeatureReachDahai):
         num_akadoras = tehai_akadora_num + furo_akadora_num
 
         shanten_normal, shanten_kokushi, shanten_chitoitsu = \
-            self.shanten_analysis.calc_all_shanten(nums, len(player_furos))
+            self.shanten_analysis.calc_all_shanten(
+                nums, len(player_furos))
 
         hora_results = []
         if 0 <= shanten_normal <= self.DEPTH-1:
@@ -89,31 +102,6 @@ class TsumoActorDfsV0(FeatureReachDahai):
                 shanten_normal=shanten_normal,
             )
             hora_results.extend(normal_results)
-
-        if 0 <= shanten_chitoitsu <= self.DEPTH-1:
-            chitoitsu_results = self.dfs.dfs_with_score_chitoitsu(
-                nums,
-                player_furos,
-                self.DEPTH,
-                oya=oya,
-                bakaze=bakaze,
-                jikaze=jikaze,
-                doras=doras,
-                uradoras=uradoras,
-                num_akadoras=num_akadoras,
-                shanten_chitoitsu=shanten_chitoitsu,
-            )
-            hora_results.extend(chitoitsu_results)
-
-        if 0 <= shanten_kokushi <= self.DEPTH-1:
-            kokushi_results = self.dfs.dfs_with_score_kokushi(
-                nums,
-                player_furos,
-                self.DEPTH,
-                oya=oya,
-                shanten_kokushi=shanten_kokushi,
-            )
-            hora_results.extend(kokushi_results)
 
         hora_results = [r for r in hora_results if r.valid()]
 

@@ -13,7 +13,7 @@ from mjaigym.board import BoardState
 from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
 
 
-from mjaigym_ml.features.custom.reach_dahai.tsumo_actor_dfsV0 import TsumoActorDfsV0
+from mjaigym_ml.features.custom.reach_dahai.dfsV0 import DfsV0
 
 
 def test_horapoint_dfs():
@@ -39,7 +39,7 @@ def test_horapoint_dfs():
     # 先読み特徴量のテスト
     target_player = state.previous_action['actor']
 
-    extractor = TsumoActorDfsV0()
+    extractor = DfsV0()
     result = np.zeros((extractor.get_length(), 34))
     board_state = board.get_state()
 
@@ -80,11 +80,9 @@ def test_horapoint_dfs():
     # (8000点, C, あと1枚）の場所にフラグが立っているか
     point_target_index = extractor.target_points.index(8000)
     print("point_target_index", point_target_index)
-    print(
-        point_target_index + len(YAKU_CHANNEL_MAP)*extractor.DEPTH,
-        Pai.from_str("C").id)
     assert output[
-        point_target_index + len(YAKU_CHANNEL_MAP)*extractor.DEPTH,
+        point_target_index +
+        len(YAKU_CHANNEL_MAP) * extractor.DEPTH,  # 役部分を飛ばしている
         Pai.from_str("C").id] == 1
 
 

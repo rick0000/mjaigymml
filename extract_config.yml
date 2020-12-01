@@ -10,9 +10,9 @@ on_reach_dahai:
   # すべてのアクションについて抽出する特徴量
   ankanV0.py: AnkanV0
   anpaiV0.py: AnpaiV0
-  tsumo_actor_dfsV0.py: TsumoActorDfsV0
+  dfsV0.py: DfsV0
 
-on_pon_chi_kan: {}
+on_pon_chi_kan: 
   # ポン、チー、カンのときのみ抽出する特徴量
-  # BBBV0.py: BBBV0
+  pon_chi_kan_dfsV0.py: PonChiKanDfsV0
 

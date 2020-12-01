@@ -16,6 +16,10 @@ class LabelRecord(NamedTuple):
     honba: int  # 本場
     kyotaku: int  # 供託
 
+    candidate_action_type: str  # 副露行動候補のタイプ
+    next_and_candidate_is_same: bool  # 副露行動候補が次のアクションで採用されたか
+    next_action_type: str  # その後取られたアクションのタイプ
+
     dahai: bool  # 打牌選択局面の場合1、それ以外0
     reach: bool  # リーチ可能局面の場合1、それ以外0
     chi: bool  # チー可能局面の場合1、それ以外0
@@ -35,7 +39,7 @@ class LabelRecord(NamedTuple):
     end_score_2: int
     end_score_3: int
 
-    next_action_type: str  # その後取られたアクションのタイプ
+    candidate_action: Dict  # 副露候補
     next_action: Dict  # その後取られたアクション
 
 

@@ -119,71 +119,68 @@ class FeatureAnalyser():
                 dahai, reach, pon, chi, kan = self._possible_action_types(
                     board_state, next_action)
 
-                # 特徴量を計算
-                # feature = None
+                if dahai:
+                    # dahaiの教師データを作成
+                    record = LabelRecord(
+                        filename=mjson.path.name,
+                        mjson_line_index=mjson_line_index,
+                        kyoku_line_index=kyoku_line_index,
+                        kyoku_line_num=len(kyoku.kyoku_mjsons),
+                        kyoku_index=kyoku_index,
+                        kyoku=kyoku.kyoku_id,
+                        bakaze=kyoku.bakaze,
+                        honba=kyoku.honba,
+                        kyotaku=board_state.kyotaku,
+                        dahai=dahai,
+                        reach=reach,
+                        chi=chi,
+                        pon=pon,
+                        kan=kan,
+
+                        score_diff_0=kyoku.result_scores[0] -
+                        kyoku.initial_scores[0],
+                        score_diff_1=kyoku.result_scores[1] -
+                        kyoku.initial_scores[1],
+                        score_diff_2=kyoku.result_scores[2] -
+                        kyoku.initial_scores[2],
+                        score_diff_3=kyoku.result_scores[3] -
+                        kyoku.initial_scores[3],
+
+                        initial_score_0=kyoku.initial_scores[0],
+                        initial_score_1=kyoku.initial_scores[1],
+                        initial_score_2=kyoku.initial_scores[2],
+                        initial_score_3=kyoku.initial_scores[3],
+
+                        end_score_0=kyoku.result_scores[0],
+                        end_score_1=kyoku.result_scores[1],
+                        end_score_2=kyoku.result_scores[2],
+                        end_score_3=kyoku.result_scores[3],
+
+                        next_action_type=next_action["type"],
+                        next_action=next_action,
+                    )
+
+                    labels.append(record)
+
+                    # 特徴量を計算
+                    common_features = np.zeros(
+                        (1, self.common_length, 34))
+                    start_index = 0
+                    for f in self.common_extractors:
+                        feature_name = f.__class__.__name__
+                        target_array = common_features[
+                            0,
+                            start_index:start_index+f.get_length(),
+                            :
+                        ]
+                        f.calc(target_array, board_state)
+                        feature_key = self._get_feature_key(
+                            mjson_line_index, feature_name, 0)
+                        features[feature_key] = target_array
+
+                if reach:
 
                 # 副露特徴量を計算
-                # furo_feature = None
-
-                # 1状態分の教師データを作成
-                record = LabelRecord(
-                    filename=mjson.path.name,
-                    mjson_line_index=mjson_line_index,
-                    kyoku_line_index=kyoku_line_index,
-                    kyoku_line_num=len(kyoku.kyoku_mjsons),
-                    kyoku_index=kyoku_index,
-                    kyoku=kyoku.kyoku_id,
-                    bakaze=kyoku.bakaze,
-                    honba=kyoku.honba,
-                    kyotaku=board_state.kyotaku,
-                    dahai=dahai,
-                    reach=reach,
-                    chi=chi,
-                    pon=pon,
-                    kan=kan,
-
-                    score_diff_0=kyoku.result_scores[0] -
-                    kyoku.initial_scores[0],
-                    score_diff_1=kyoku.result_scores[1] -
-                    kyoku.initial_scores[1],
-                    score_diff_2=kyoku.result_scores[2] -
-                    kyoku.initial_scores[2],
-                    score_diff_3=kyoku.result_scores[3] -
-                    kyoku.initial_scores[3],
-
-                    initial_score_0=kyoku.initial_scores[0],
-                    initial_score_1=kyoku.initial_scores[1],
-                    initial_score_2=kyoku.initial_scores[2],
-                    initial_score_3=kyoku.initial_scores[3],
-
-                    end_score_0=kyoku.result_scores[0],
-                    end_score_1=kyoku.result_scores[1],
-                    end_score_2=kyoku.result_scores[2],
-                    end_score_3=kyoku.result_scores[3],
-
-                    next_action_type=next_action["type"],
-                    next_action=next_action,
-                )
-
-                labels.append(record)
-
-                # common feature
-                common_features = np.zeros(
-                    (1, self.common_length, 34))
-                start_index = 0
-                for f in self.common_extractors:
-                    feature_name = f.__class__.__name__
-                    target_array = common_features[
-                        0,
-                        start_index:start_index+f.get_length(),
-                        :
-                    ]
-                    f.calc(target_array, board_state)
-                    feature_key = self._get_feature_key(
-                        mjson_line_index, feature_name, 0)
-                    features[feature_key] = target_array
-
-                # reach dahai feature
                 reach_dahai_features = np.zeros(
                     (4, self.reach_dahai_length, 34))
                 start_index = 0
@@ -199,12 +196,27 @@ class FeatureAnalyser():
                         feature_key = self._get_feature_key(
                             mjson_line_index, feature_name, player_id)
                         features[feature_key] = target_array
+                """
 
-                # pon chi kan feature
-                for player_id in range(4):
-                    feature_key = self._get_feature_key(
-                        mjson_line_index, "dummy_feature", player_id)
-                    features[feature_key] = np.random.randint(0, 2, (240, 34))
+                if pon or chi or kan:
+                    # pon chi kan feature
+                    for player_id in range(4):
+                        possible_actions = board_state.possible_actions[player_id]
+                        for possible_action in possible_actions:
+                            pon_chi_kan_features = np.zeros(
+                                (4, self.pon_chi_kan_length, 34))
+                            start_index = 0
+                            for f in self.pon_chi_kan_extractors:
+                                feature_name = f.__class__.__name__
+                                target_array = pon_chi_kan_features[
+                                    player_id,
+                                    start_index:start_index+f.get_length(),
+                                    :
+                                ]
+                                f.calc(target_array, board_state, player_id)
+                                feature_key = self._get_feature_key(
+                                    mjson_line_index, feature_name, player_id)
+                                features[feature_key] = target_array
 
             line_count += len(kyoku.kyoku_mjsons)
 
@@ -216,11 +228,13 @@ class FeatureAnalyser():
         )
         return analysis
 
-    def _get_feature_key(self, mjson_line_index, feature_name, player_id=None):
+    def _get_feature_key(self, mjson_line_index, feature_name, player_id=None, possible_action_id=None):
         if player_id is None:
             return f"{mjson_line_index}/{feature_name}"
-        else:
+        elif possible_action_id is None:
             return f"{mjson_line_index}/{feature_name}/{player_id}"
+        else:
+            return f"{mjson_line_index}/{feature_name}/{player_id}/{possible_action_id}"
 
     def _need_calclate(self, state: BoardState):
         # 選択可能なアクションが複数ない場合は教師データにならない。
