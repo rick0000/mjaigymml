@@ -1,15 +1,100 @@
 import argparse
 import multiprocessing
-from multiprocessing import Pool
+import threading
+from collections import deque
+from multiprocessing import Pool, Manager, Queue
 
 from tqdm import tqdm
 
+from mjaigym_ml.features.feature_analyser_factory import FeatureAnalyzerFactory
 from mjaigym_ml.features.feature_analyser import FeatureAnalyser
 from mjaigym_ml.storage.local_file_mjson_storage import LocalFileMjsonStorage
+from mjaigym_ml.storage.mjson_storage import MjsonStorage
 from mjaigym_ml.storage.feature_storage_localfs \
     import FeatureStorageLocalFs
 from mjaigym_ml.features.extract_config import ExtractConfig
+from loggers import logger_main as lgs
 
+
+TEST_DATASET = Queue()
+def get_test_dataset(test_mjson_storage):
+    # テストデータセット作成（初回に作成したものを使いまわす）
+    if len(TEST_DATASET) == 0:
+        # データ生成
+        pass
+
+    return TEST_DATASET
+
+
+
+
+def _run_onegame_analyze(args):
+    mjson, analyser, dataset_queue = args
+    
+    dataset_queue.put([mjson])
+
+
+def run_extract_process(
+        train_mjson_storage:MjsonStorage,
+        analyser:FeatureAnalyser,
+        dataset_queue:Queue
+    ):
+    """
+    特徴量抽出をマルチプロセスで行う
+    """
+    lgs.info("start extract process")
+    args = [(mjson, analyser, dataset_queue) for mjson in train_mjson_storage.get_mjsons()]
+
+    cpu_num = 2
+    if cpu_num == 1:
+        for arg in args:
+            _run_onegame_analyze(arg)
+    else:
+        with Pool(processes=cpu_num) as pool:
+            # with tqdm(total=len(args)) as t:
+            for _ in pool.imap_unordered(_run_onegame_analyze, args):
+                pass
+                # t.update(1)
+
+
+
+    for m in train_mjson_storage.get_mjsons():
+        dataset_queue.put([m]) # 一時的にmjsonファイルのリストを挿入
+    
+    
+
+
+
+def run_train(
+        trainer,
+        model,
+        dataset_queue,
+        feature_generate_process
+    ):
+
+    lgs.info("start train")
+    while True:
+        datasets = deque()
+        
+        while True:
+            if len(datasets) < 256:
+                # lgs.info("consume dataset queue")
+                try:
+                    one_mjson_dataset = dataset_queue.get(timeout=1)
+                    datasets.extend(one_mjson_dataset)
+                except:
+                    if not feature_generate_process.is_alive():
+                        lgs.info("generate process finished, end train.")
+                        return
+            else:
+                lgs.info("filled queue, start train")
+                train_data = list(datasets)
+                datasets.clear()
+                # trainer.train()
+
+                
+        
+        
 
 
 
@@ -23,16 +108,41 @@ def run(
         model_save_dir,
         model_dir,
         ):
-    
 
-    exit(0)
     # 牌譜読み込み定義
+    train_mjson_storage = LocalFileMjsonStorage(train_mjson_dir, 100) # 10000牌譜ファイル分抽出
+    test_mjson_storage = LocalFileMjsonStorage(test_mjson_dir, 100) # 100牌譜ファイル分抽出
+    
     # 牌譜データ抽出者定義
-    # 抽出プロセス実行
+    analyser = FeatureAnalyzerFactory.get_analyzer(model_type, extract_config)
 
+    # トレーニングデータセット連携用キュー
+    m = Manager()
+    dataset_queue = m.Queue()
+
+    # トレーニングデータセット抽出プロセス起動
+    p = threading.Thread(
+            target=run_extract_process,
+            args=(train_mjson_storage,
+                analyser,
+                dataset_queue),
+            daemon=True
+        )
+    p.start()
+
+    # 特徴量消費側定義
     # モデル定義
-    # 学習機定義
-    # 実行
+    model = None
+    # 学習の定義
+    trainer = None
+    # 学習の実行
+    run_train(
+        trainer,
+        model,
+        dataset_queue,
+        p)
+    p.join()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()    
@@ -47,12 +157,15 @@ if __name__ == "__main__":
 
     arg = parser.parse_args()
 
+    extract_config = ExtractConfig.load(arg.extract_config)
+    
+
     config = ExtractConfig.load(arg.extract_config)
     run(
         arg.model_type, 
         arg.train_mjson_dir, 
         arg.test_mjson_dir,
-        arg.extract_config,
+        extract_config,
         arg.model_config,
         arg.train_config,
         arg.model_save_dir,
