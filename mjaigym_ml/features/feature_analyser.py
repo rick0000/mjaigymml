@@ -6,13 +6,13 @@ import numpy as np
 
 from mjaigym.mjson import Mjson
 from mjaigym.board.board_state import BoardState
-from mjaigym_ml.features.feature_analysis import FeatureAnalysis
 from mjaigym.board.archive_board import ArchiveBoard
 from .extract_config import ExtractConfig
 from mjaigym_ml.features.custom.feature_common import FeatureCommon
 from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
 from mjaigym_ml.features.custom.feature_pon_chi_kan import FeaturePonChiKan
-from mjaigym_ml.features.feature_analysis import LabelRecord
+from mjaigym_ml.features.feature_analysis \
+    import LabelRecord, FeatureRecord, Datasets
 
 
 class FeatureAnalyser():
@@ -79,23 +79,25 @@ class FeatureAnalyser():
         for extractor in self.pon_chi_kan_extractors:
             extractor.reset()
 
-    def analyze_list(self, mjson_list: List[Dict]) -> FeatureAnalysis:
+    def analyze_list(self, mjson_list: List[Dict]) -> Datasets:
         """
         辞書のリストで与えられたアクションの履歴について特徴量の算出を行う。
         全アクションではなく最後の状態についてのみ特徴量の算出を行う。
         """
         raise NotImplementedError()
 
-    def analyse_mjson(self, mjson: Mjson) -> FeatureAnalysis:
+    def analyse_mjson(
+            self,
+            mjson: Mjson,
+            extract_rate: float = 1.0) -> Datasets:
         """
         Mjsonオブジェクトで与えられたアクションの履歴について特徴量の算出を行う。
-        全アクションについてアクション適用後の特徴量の算出を行う。
         """
-
-        labels = []
-        features = {}
+        if not (0 < extract_rate <= 1.0):
+            raise Exception("extract_rate must be in (0,1]")
 
         board = ArchiveBoard()
+        dataset = Datasets(mjson.path.name)
 
         line_count = 0
         for kyoku_index, kyoku in enumerate(mjson.game.kyokus):
@@ -120,8 +122,7 @@ class FeatureAnalyser():
                     board_state, next_action)
 
                 if dahai:
-                    # dahaiの教師データを作成
-                    record = LabelRecord(
+                    label_record = LabelRecord(
                         filename=mjson.path.name,
                         mjson_line_index=mjson_line_index,
                         kyoku_line_index=kyoku_line_index,
@@ -158,83 +159,49 @@ class FeatureAnalyser():
 
                         next_action_type=next_action["type"],
                         next_action=next_action,
+                        candidate_action_type=None,  # 打牌では利用しないカラム
+                        next_and_candidate_is_same=None,  # 打牌では利用しないカラム
+                        candidate_action=None,  # 打牌では利用しないカラム
                     )
 
-                    labels.append(record)
+                    feature_record = FeatureRecord(
+                        board_state,
+                    )
+                    dataset.append(label_record, feature_record)
 
-                    # 特徴量を計算
-                    common_features = np.zeros(
-                        (1, self.common_length, 34))
-                    start_index = 0
-                    for f in self.common_extractors:
-                        feature_name = f.__class__.__name__
-                        target_array = common_features[
-                            0,
-                            start_index:start_index+f.get_length(),
-                            :
-                        ]
-                        f.calc(target_array, board_state)
-                        feature_key = self._get_feature_key(
-                            mjson_line_index, feature_name, 0)
-                        features[feature_key] = target_array
-
-                
-
-                # 副露特徴量を計算
-                reach_dahai_features = np.zeros(
-                    (4, self.reach_dahai_length, 34))
-                start_index = 0
-                for f in self.reach_dahai_extractors:
-                    feature_name = f.__class__.__name__
-                    for player_id in range(4):
-                        target_array = reach_dahai_features[
-                            player_id,
-                            start_index:start_index+f.get_length(),
-                            :
-                        ]
-                        f.calc(target_array, board_state, player_id)
-                        feature_key = self._get_feature_key(
-                            mjson_line_index, feature_name, player_id)
-                        features[feature_key] = target_array
-                """
-
-                if pon or chi or kan:
-                    # pon chi kan feature
-                    for player_id in range(4):
-                        possible_actions = board_state.possible_actions[player_id]
-                        for possible_action in possible_actions:
-                            pon_chi_kan_features = np.zeros(
-                                (4, self.pon_chi_kan_length, 34))
-                            start_index = 0
-                            for f in self.pon_chi_kan_extractors:
-                                feature_name = f.__class__.__name__
-                                target_array = pon_chi_kan_features[
-                                    player_id,
-                                    start_index:start_index+f.get_length(),
-                                    :
-                                ]
-                                f.calc(target_array, board_state, player_id)
-                                feature_key = self._get_feature_key(
-                                    mjson_line_index, feature_name, player_id)
-                                features[feature_key] = target_array
-                """
             line_count += len(kyoku.kyoku_mjsons)
 
         # 作成した1ゲーム分のデータをまとめる
-        analysis = FeatureAnalysis(
-            Path(mjson.path),
-            labels,
-            features,
-        )
-        return analysis
+        return dataset
 
-    def _get_feature_key(self, mjson_line_index, feature_name, player_id=None, possible_action_id=None):
-        if player_id is None:
-            return f"{mjson_line_index}/{feature_name}"
-        elif possible_action_id is None:
-            return f"{mjson_line_index}/{feature_name}/{player_id}"
-        else:
-            return f"{mjson_line_index}/{feature_name}/{player_id}/{possible_action_id}"
+    def reach_dahai_analyze(self, board_state):
+        reach_dahai_result = {}
+        for player_id in range(4):
+            result = np.zeros((
+                self.reach_dahai_length, 34,
+            ))
+            start_index = 0
+            for e in self.reach_dahai_extractors:
+                target_array = result[start_index:start_index +
+                                      e.get_length(), :]
+                e.calc(
+                    target_array[0, :],
+                    board_state,
+                    player_id
+                )
+            reach_dahai_result[player_id] = target_array
+
+        return np.zeros((1, 2, 3)), \
+            reach_dahai_result, \
+            reach_dahai_result
+
+    # def _get_feature_key(self, mjson_line_index, feature_name, player_id=None, possible_action_id=None):
+    #     if player_id is None:
+    #         return f"{mjson_line_index}/{feature_name}"
+    #     elif possible_action_id is None:
+    #         return f"{mjson_line_index}/{feature_name}/{player_id}"
+    #     else:
+    #         return f"{mjson_line_index}/{feature_name}/{player_id}/{possible_action_id}"
 
     def _need_calclate(self, state: BoardState):
         # 選択可能なアクションが複数ない場合は教師データにならない。

@@ -1,8 +1,11 @@
 from pathlib import Path
 from typing import Dict, NamedTuple, List
+from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
+
+from mjaigym.board.board_state import BoardState
 
 
 class LabelRecord(NamedTuple):
@@ -43,23 +46,80 @@ class LabelRecord(NamedTuple):
     next_action: Dict  # その後取られたアクション
 
 
-class FeatureAnalysis():
+@dataclass
+class FeatureRecord():
+    """
+    board_stateから求めた特徴量
+    計算量削減のため必要になった際に特徴量の生成を行う。
+    データオーグメンテーションもここで対応する。
+    Ex) * アクションプレーヤーによる席並び替え
+        * 牌種類のローテーション
+    """
+    common_feature: np.array
+    reach_dahai_feature: Dict[int, np.array]  # 席、特徴量の辞書
+    pon_chi_kan_feature: Dict[int, np.array]  # 席、特徴量の辞書
+
+    def __init__(
+            self,
+            board_state: BoardState,
+            candidate_action: Dict = None,
+    ):
+        self.board_state = board_state
+        self.candidate_action = candidate_action
+
+    def get_feature(
+            self,
+            common_feature_calc_function,
+            reach_dahai_feature_calc_function,
+            pon_chi_kan_feature_calc_function,
+    ):
+        if self.common_feature is None:
+            self.common_feature = common_feature_calc_function(
+                self.board_state)
+
+        if self.reach_dahai_feature is None:
+            self.reach_dahai_feature = reach_dahai_feature_calc_function(
+                self.board_state)
+
+        if self.pon_chi_kan_feature is None:
+            self.pon_chi_kan_feature = pon_chi_kan_feature_calc_function(
+                self.board_state)
+
+        # concat, rotate feature
+        concated = np.concatenate(
+            [self.common_feature]
+            + [self.reach_dahai_feature.values()]
+            + [self.pon_chi_kan_feature.values()], axis=0)
+        return concated
+
+
+class Datasets():
     """
     1ゲーム分の牌譜解析情報
     """
 
     def __init__(
-            self,
-            fname: Path,
-            labels: List[LabelRecord],
-            features: Dict[str, np.array]):
-
+        self,
+        fname: Path,
+    ):
         self.fname = fname
-        self.labels = pd.DataFrame(data=labels)
-        self.features = features
+        self.labels = []
+        self.features = []
+
+    def append(self, label: LabelRecord, feature: FeatureRecord):
+        self.labels.append(label)
+        self.features.append(feature)
 
     def get_dahai_records(self):
-        pass
+        # 打牌のみ抽出
+        result_index = [i for (i, l) in enumerate(self.labels) if l.dahai]
+
+        # 変換
+        result_labels = [self.labels[i] for i in range(result_index)]
+        result_features = [self.features[i] for i in range(result_index)]
+
+        return pd.DataFrame(data=result_labels), \
+            [f.get_feature() for f in result_features]
 
     def get_reach_records(self):
         pass
