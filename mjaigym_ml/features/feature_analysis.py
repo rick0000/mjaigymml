@@ -1,11 +1,11 @@
-from pathlib import Path
-from typing import Dict, NamedTuple, List
-from dataclasses import dataclass
-
-import numpy as np
-import pandas as pd
-
+from mjaigym.board.mj_move import MjMove
 from mjaigym.board.board_state import BoardState
+import pandas as pd
+import numpy as np
+from dataclasses import dataclass
+from typing import Dict, NamedTuple, List
+from pathlib import Path
+import random
 
 
 class LabelRecord(NamedTuple):
@@ -50,7 +50,7 @@ class LabelRecord(NamedTuple):
 class FeatureRecord():
     """
     board_stateから求めた特徴量
-    計算量削減のため必要になった際に特徴量の生成を行う。
+    必要になった際に特徴量の生成を行う。
     データオーグメンテーションもここで対応する。
     Ex) * アクションプレーヤーによる席並び替え
         * 牌種類のローテーション
@@ -93,9 +93,25 @@ class FeatureRecord():
         return concated
 
 
+class Dataset():
+    def __init__(
+        self,
+        label: LabelRecord,
+        board_state: BoardState,
+    ):
+        self.label = label
+        self.board_state = board_state
+        self.feature = None
+        self.is_calclated = False
+
+    def set_feature(self, feature: FeatureRecord):
+        self.feature = feature
+
+
 class Datasets():
     """
-    1ゲーム分の牌譜解析情報
+    ラベルと盤面情報と特徴量のセット。
+    計算量削減のため特徴量はダウンサンプリング後に計算する。
     """
 
     def __init__(
@@ -104,40 +120,13 @@ class Datasets():
     ):
         self.fname = fname
         self.labels = []
+        self.board_states = []
         self.features = []
+        self.is_calclated = False
 
-    def append(self, label: LabelRecord, feature: FeatureRecord):
+    def append(self, label: LabelRecord, board_state: BoardState):
         self.labels.append(label)
-        self.features.append(feature)
-
-    def get_dahai_records(self):
-        # 打牌のみ抽出
-        result_index = [i for (i, l) in enumerate(self.labels) if l.dahai]
-
-        # 変換
-        result_labels = [self.labels[i] for i in range(result_index)]
-        result_features = [self.features[i] for i in range(result_index)]
-
-        return pd.DataFrame(data=result_labels), \
-            [f.get_feature() for f in result_features]
-
-    def get_reach_records(self):
-        pass
-
-    def get_pon_records(self):
-        pass
-
-    def get_chi_records(self):
-        pass
-
-    def get_kan_records(self):
-        pass
-
-    def get_records(self):
-        """
-        全データを返す
-        """
-        return self.features, self.labels
+        self.board_states.append(board_state)
 
     def get_rotate_pai_feature(self):
         """

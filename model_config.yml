@@ -1,0 +1,4 @@
+batch_size: 256
+learning_rate: 0.01
+mid_channels: 256
+resnet_repeat: 20

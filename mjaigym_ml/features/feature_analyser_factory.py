@@ -1,10 +1,11 @@
-from .feature_analyser import FeatureAnalyser
-from .extract_config import ExtractConfig
+from mjaigym_ml.features.feature_analyser import FeatureAnalyser
+from mjaigym_ml.config.extract_config import ExtractConfig
+
 
 class FeatureAnalyzerFactory():
     @classmethod
-    def get_analyzer(cls, model_type:str, extract_config:ExtractConfig):
-        
+    def get_analyzer(cls, model_type: str, extract_config: ExtractConfig):
+
         if model_type not in [
             "dahai", "reach", "pon", "kan", "chi"
         ]:
@@ -20,9 +21,8 @@ class FeatureAnalyzerFactory():
             return cls._get_chi_analyzer(extract_config)
         elif model_type == "kan":
             return cls._get_kan_analyzer(extract_config)
-        
+
         raise Exception("not intended path")
-        
 
     @classmethod
     def _get_dahai_analyzer(cls, extract_config):
@@ -43,7 +43,3 @@ class FeatureAnalyzerFactory():
     @classmethod
     def _get_chi_analyzer(cls, extract_config):
         pass
-
-
-
-    
