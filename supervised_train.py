@@ -57,7 +57,7 @@ def run_extract_process(
         (mjson, analyser, dataset_queue, train_config)
         for mjson in train_mjson_storage.get_mjsons()]
 
-    cpu_num = 1
+    cpu_num = 12
     if cpu_num == 1:
         for arg in args:
             _run_onegame_analyze(arg)
@@ -109,7 +109,7 @@ def run(
 
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
-        train_mjson_dir, 100)  # 10000牌譜ファイル分抽出
+        train_mjson_dir, 1000)  # 10000牌譜ファイル分抽出
     # test_mjson_storage = LocalFileMjsonStorage(
     #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
 

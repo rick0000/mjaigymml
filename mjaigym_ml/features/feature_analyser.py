@@ -1,6 +1,7 @@
 from typing import Dict, List
 import importlib
 import random
+from pathlib import Path
 
 import numpy as np
 
@@ -89,11 +90,13 @@ class FeatureAnalyser():
 
     def analyse_mjson(
         self,
-        mjson: Mjson,
+        mjson,
     ) -> List[Dataset]:
         """
         Mjsonオブジェクトで与えられたアクションの履歴についてラベルと盤面状態の算出を行う。
         """
+        if isinstance(mjson, Path):
+            mjson = Mjson.load(mjson)
 
         board = ArchiveBoard()
         datasets = []
