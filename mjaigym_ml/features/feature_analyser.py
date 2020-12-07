@@ -180,11 +180,8 @@ class FeatureAnalyser():
             train_config: TrainConfig
     ):
         """
-        指定された record_type のラベルに関するデータを返す。
-        指定された割合でダウンサンプリングを行う。
-
-        record_type: 取得する特徴量のタイプ
-        sampling_rate: 残すレコードの割合
+        train_config.model_type で指定されたラベルに関するデータを返す。
+        train_config.sampling_rate で指定された割合でダウンサンプリングを行う。
         """
 
         # get type records
@@ -198,12 +195,22 @@ class FeatureAnalyser():
             records = [d for d in datasets if d.label.chi]
         elif train_config.model_type == "kan":
             records = [d for d in datasets if d.label.kan]
+        else:
+            raise Exception("not intended path.")
 
         # sampling
         take_num = max(1, int(len(records) * train_config.sampling_rate))
         records = random.sample(records, take_num)
 
         return records
+
+    def calc_feature(self, datasets: List[Dataset], train_config: TrainConfig):
+        if train_config.model_type in ["dahai", "reach"]:
+            pass
+        elif train_config.model_type in ["pon", "chi", "kan"]:
+            pass
+        else:
+            raise Exception("not intended path")
 
     def _need_calclate(self, state: BoardState):
         # 選択可能なアクションが複数ない場合は教師データにならない。

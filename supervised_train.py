@@ -14,6 +14,7 @@ from mjaigym_ml.storage.feature_storage_localfs \
     import FeatureStorageLocalFs
 from mjaigym_ml.config.extract_config import ExtractConfig
 from mjaigym_ml.config.train_config import TrainConfig
+from mjaigym_ml.config.model_config import ModelConfig
 from loggers import logger_main as lgs
 
 
@@ -36,7 +37,7 @@ def _run_onegame_analyze(args):
     datasets = analyser.filter_datasets(datasets, train_config)
 
     # calc_feature() updates datasets object
-    analyser.calc_feature(datasets)
+    analyser.calc_feature(datasets, train_config)
 
     dataset_queue.put(datasets)
 
@@ -109,8 +110,8 @@ def run(
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
         train_mjson_dir, 100)  # 10000牌譜ファイル分抽出
-    test_mjson_storage = LocalFileMjsonStorage(
-        test_mjson_dir, 100)  # 100牌譜ファイル分抽出
+    # test_mjson_storage = LocalFileMjsonStorage(
+    #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
 
     # 牌譜解析の設定
     analyser = FeatureAnalyzerFactory.get_analyzer(model_type, extract_config)
