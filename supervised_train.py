@@ -63,37 +63,10 @@ def run_extract_process(
             _run_onegame_analyze(arg)
     else:
         with multiprocessing.Pool(processes=cpu_num) as pool:
-            # with tqdm(total=len(args)) as t:
-            for _ in pool.imap_unordered(_run_onegame_analyze, args):
-                pass
-                # t.update(1)
-
-
-def run_train(
-    trainer,
-    model,
-    dataset_queue,
-    feature_generate_process
-):
-
-    lgs.info("start train")
-    while True:
-        datasets = deque()
-
-        while True:
-            if len(datasets) < 256:
-                try:
-                    one_mjson_dataset = dataset_queue.get(timeout=1)
-                    datasets.extend(one_mjson_dataset)
-                except queue.Empty:
-                    if not feature_generate_process.is_alive():
-                        lgs.info("generate process finished, end train.")
-                        return
-            else:
-                lgs.info("filled queue, start train")
-                train_data = list(datasets)
-                datasets.clear()
-                # trainer.train()
+            with tqdm(total=len(args)) as t:
+                for _ in pool.imap_unordered(_run_onegame_analyze, args):
+                    # pass
+                    t.update(1)
 
 
 def run(
@@ -109,7 +82,7 @@ def run(
 
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
-        train_mjson_dir, 1000)  # 10000牌譜ファイル分抽出
+        train_mjson_dir, 20)  # 10000牌譜ファイル分抽出
     # test_mjson_storage = LocalFileMjsonStorage(
     #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
 
@@ -135,13 +108,17 @@ def run(
     # モデル定義
     model = None
     # 学習の定義
-    trainer = None
+    from mjaigym_ml.trainer import Trainer
+    trainer = Trainer()
     # 学習の実行
-    run_train(
-        trainer,
+    trainer.train_loop(
         model,
         dataset_queue,
-        p)
+        p,
+        train_config,
+        model_config
+    )
+
     p.join()
 
 
@@ -154,9 +131,12 @@ if __name__ == "__main__":
                         default="/data/mjson/test/201712")
     parser.add_argument("--extract_config", type=str,
                         default="extract_config.yml")
-    parser.add_argument("--model_config", type=str, default="model_config.yml")
-    parser.add_argument("--train_config", type=str, default="train_config.yml")
-    parser.add_argument("--model_save_dir", type=str, default="output/model")
+    parser.add_argument("--model_config", type=str,
+                        default="model_config.yml")
+    parser.add_argument("--train_config", type=str,
+                        default="train_config.yml")
+    parser.add_argument("--model_save_dir", type=str,
+                        default="output/model")
     parser.add_argument("--model_dir", type=str, default=None)
 
     arg = parser.parse_args()
@@ -170,7 +150,7 @@ if __name__ == "__main__":
         arg.train_mjson_dir,
         arg.test_mjson_dir,
         extract_config,
-        arg.model_config,
+        model_config,
         train_config,
         arg.model_save_dir,
         arg.model_dir,
