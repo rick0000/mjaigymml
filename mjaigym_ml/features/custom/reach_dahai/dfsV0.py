@@ -32,7 +32,7 @@ class DfsV0(FeatureReachDahai):
         24000,
         32000,
     ]
-    DEPTH = 2
+    DEPTH = 3
 
     def __init__(self):
         self.dfs = Dfs()
@@ -50,7 +50,6 @@ class DfsV0(FeatureReachDahai):
         # ツモ番以外では計算しない
         if len(player_tehai) % 3 != 2:
             return
-
         nums = [0] * 34
         for t in player_tehai:
             nums[t.id] += 1

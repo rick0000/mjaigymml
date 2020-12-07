@@ -78,7 +78,7 @@ def test_horapoint_dfs():
         Pai.from_str("E").id] == 1
 
     # (8000点, C, あと1枚）の場所にフラグが立っているか
-    point_target_index = extractor.target_points.index(8000)
+    point_target_index = extractor.target_points.index(7700)
     print("point_target_index", point_target_index)
     assert output[
         point_target_index +

@@ -93,7 +93,6 @@ class FeatureAnalyser():
     ) -> List[Dataset]:
         """
         Mjsonオブジェクトで与えられたアクションの履歴についてラベルと盤面状態の算出を行う。
-        Analyserオブジェクト作成時のextract_configに指定の sampling_rate (0.0~1.0) でダウンサンプリングを行う。
         """
 
         board = ArchiveBoard()
@@ -108,7 +107,7 @@ class FeatureAnalyser():
                 # ファイル上での行数通し番号
                 mjson_line_index = line_count + kyoku_line_index
                 # それぞれのモデルの学習対象局面でない行はスキップ
-                if not self._need_calclate(board_state):
+                if not self._is_label_scene(board_state):
                     continue
 
                 if kyoku_line_index+1 >= len(kyoku.kyoku_mjsons):
@@ -167,8 +166,18 @@ class FeatureAnalyser():
                     candidate_action=None,  # 打牌では利用しないカラム
                 )
 
-                dataset = Dataset(label_record, board_state)
-                datasets.append(dataset)
+                if pon or chi or kan:
+                    for player_id in range(4):
+                        for possible_action in board_state.possible_actions[player_id]:
+                            if possible_action['type'] in ["pon", "chi", "ankan", "kakan", "daiminkan"]:
+                                # 1副露アクション候補に対して1レコード発生
+                                dataset = Dataset(
+                                    label_record, board_state, possible_action)
+                                datasets.append(dataset)
+                else:
+                    # 1行に対して1レコード発生
+                    dataset = Dataset(label_record, board_state)
+                    datasets.append(dataset)
 
             line_count += len(kyoku.kyoku_mjsons)
 
@@ -205,15 +214,70 @@ class FeatureAnalyser():
         return records
 
     def calc_feature(self, datasets: List[Dataset], train_config: TrainConfig):
-        if train_config.model_type in ["dahai", "reach"]:
-            pass
-        elif train_config.model_type in ["pon", "chi", "kan"]:
-            pass
-        else:
-            raise Exception("not intended path")
+        common_result_array = np.zeros(
+            (len(datasets), self.common_length, 34))
 
-    def _need_calclate(self, state: BoardState):
-        # 選択可能なアクションが複数ない場合は教師データにならない。
+        reach_dahai_result_array = np.zeros(
+            (len(datasets), 4, self.reach_dahai_length, 34))
+
+        for dataset_index, dataset in enumerate(datasets):
+            common_start_index = 0
+            reach_dahai_start_index = 0
+            # calc common feature
+            for e in self.common_extractors:
+                target_array = common_result_array[
+                    dataset_index,
+                    common_start_index:common_start_index + e.get_length(),
+                    :]
+                e.calc(
+                    result=target_array,
+                    board_state=dataset.board_state,
+                )
+
+            # calc reach dahai feature
+            for player_id in range(4):
+                for e in self.reach_dahai_extractors:
+                    target_array = reach_dahai_result_array[
+                        dataset_index,
+                        player_id,
+                        reach_dahai_start_index:reach_dahai_start_index + e.get_length(),
+                        :]
+                    e.calc(
+                        result=target_array,
+                        board_state=dataset.board_state,
+                        player_id=player_id,
+                    )
+
+            # calc pon_chi_kan_feaature
+            if dataset.label.pon or dataset.label.chi or dataset.label.kan:
+                # 出現する場合のみメモリ確保
+                pon_chi_kan_result_array = np.zeros(
+                    (self.pon_chi_kan_length, 34))
+                pon_chi_kan_index = 0
+                for e in self.pon_chi_kan_extractors:
+                    target_array = pon_chi_kan_result_array[
+                        pon_chi_kan_index:pon_chi_kan_index + e.get_length(),
+                        :]
+
+                    e.calc(
+                        result=target_array,
+                        board_state=dataset.board_state,
+                        player_id=dataset.candidate_furo_action['actor'],
+                        candidate_furo_action=dataset.candidate_furo_action
+                    )
+
+            # update result object
+            feature = FeatureRecord(
+                common_result_array[dataset_index],
+                reach_dahai_result_array[dataset_index],
+                None
+            )
+            dataset.set_feature(feature)
+
+    def _is_label_scene(self, state: BoardState):
+        # 選択可能なアクションが複数ない場合
+        # =Noneアクションしか出来ない
+        # =教師データに不適当
         if all([len(actions) == 1 for actions in
                 state.possible_actions.values()]):
             return False

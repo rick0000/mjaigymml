@@ -59,48 +59,17 @@ class FeatureRecord():
     reach_dahai_feature: Dict[int, np.array]  # 席、特徴量の辞書
     pon_chi_kan_feature: Dict[int, np.array]  # 席、特徴量の辞書
 
-    def __init__(
-            self,
-            board_state: BoardState,
-            candidate_action: Dict = None,
-    ):
-        self.board_state = board_state
-        self.candidate_action = candidate_action
-
-    def get_feature(
-            self,
-            common_feature_calc_function,
-            reach_dahai_feature_calc_function,
-            pon_chi_kan_feature_calc_function,
-    ):
-        if self.common_feature is None:
-            self.common_feature = common_feature_calc_function(
-                self.board_state)
-
-        if self.reach_dahai_feature is None:
-            self.reach_dahai_feature = reach_dahai_feature_calc_function(
-                self.board_state)
-
-        if self.pon_chi_kan_feature is None:
-            self.pon_chi_kan_feature = pon_chi_kan_feature_calc_function(
-                self.board_state)
-
-        # concat, rotate feature
-        concated = np.concatenate(
-            [self.common_feature]
-            + [self.reach_dahai_feature.values()]
-            + [self.pon_chi_kan_feature.values()], axis=0)
-        return concated
-
 
 class Dataset():
     def __init__(
         self,
         label: LabelRecord,
         board_state: BoardState,
+        candidate_action: Dict = None,  # 副露用
     ):
         self.label = label
         self.board_state = board_state
+        self.candidate_action = candidate_action
         self.feature = None
         self.is_calclated = False
 
