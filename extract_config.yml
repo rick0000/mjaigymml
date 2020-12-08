@@ -16,7 +16,11 @@ on_reach_dahai:
   chiV0.py: ChiV0
   ponV0.py: PonV0
   kanV0.py: KanV0
-  
+  discardV0.py: DiscardV0
+  discard_reach_stateV0.py: DiscardReachStateV0
+  anpaiV0.py: AnpaiV0
+  rest_pai_in_viewV0: RestPaiInViewV0
+
 
 on_pon_chi_kan:
   # ポン、チー、カンのときのみ抽出する特徴量

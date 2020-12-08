@@ -219,6 +219,9 @@ class FeatureAnalyser():
         else:
             raise Exception("not intended path.")
 
+        if len(records) == 0:
+            return []
+
         # sampling
         take_num = max(1, int(len(records) * train_config.sampling_rate))
         records = random.sample(records, take_num)

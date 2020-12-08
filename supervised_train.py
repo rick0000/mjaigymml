@@ -32,7 +32,8 @@ def _run_onegame_analyze(args):
         datasets = analyser.analyse_mjson(mjson)
         # extract and sampling.
         datasets = analyser.filter_datasets(datasets, train_config)
-
+        if len(datasets) == 0:
+            return
         # calc_feature() updates datasets object
         analyser.calc_feature(datasets, train_config)
 
@@ -48,7 +49,7 @@ def run_extract_process(
     train_config: TrainConfig
 ):
     """
-    特徴量抽出をマルチプロセスで行う
+    特徴量抽出を行う
     """
 
     lgs.info("start extract process")
@@ -56,7 +57,9 @@ def run_extract_process(
         (mjson, analyser, dataset_queue, train_config)
         for mjson in train_mjson_storage.get_mjsons()]
 
-    cpu_num = 8
+    cpu_num = multiprocessing.cpu_count()
+    # cpu_num = 1 # for debug
+
     if cpu_num == 1:
         for arg in args:
             _run_onegame_analyze(arg)
@@ -81,7 +84,7 @@ def run(
 
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
-        train_mjson_dir, 100000)  # 10000牌譜ファイル分抽出
+        train_mjson_dir, 1000000)  # 10000牌譜ファイル分抽出
     # test_mjson_storage = LocalFileMjsonStorage(
     #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
 
@@ -90,7 +93,9 @@ def run(
 
     # トレーニングデータセット連携用キュー
     m = multiprocessing.Manager()
-    dataset_queue = m.Queue()
+    # 1ゲーム分のリストオブジェクトを突っ込むのでcpu数だけ用意すればOK
+    dataset_queue = m.Queue(
+        maxsize=multiprocessing.cpu_count())
 
     # トレーニングデータセット抽出プロセス起動
     p = threading.Thread(
@@ -132,7 +137,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_type", type=str, default="dahai")
     parser.add_argument("--train_mjson_dir", type=str,
-                        default="/data/mjson/train/201701")
+                        default="/data/mjson/train/")
     parser.add_argument("--test_mjson_dir", type=str,
                         default="/data/mjson/test/201712")
     parser.add_argument("--extract_config", type=str,

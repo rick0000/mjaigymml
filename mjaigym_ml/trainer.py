@@ -1,5 +1,7 @@
 import queue
 import pprint
+import random
+from collections import deque
 
 import loggers as lgs
 
@@ -7,39 +9,8 @@ import loggers as lgs
 class Trainer():
     def __init__(
         self,
-        # train_dir,
-        # test_dir,
-        # log_dir,
-        # session_name,
-        # in_on_tsumo_channels,
-        # in_other_dahai_channels,
-        # use_multiprocess=True,
-        # udpate_interbal=64,
-        # reward_discount_rate=0.99,
-        # batch_size=256,
-        # evaluate_per_update=5
     ):
         pass
-        # self.train_dir = train_dir
-        # self.test_dir = test_dir
-        # self.use_multiprocess = use_multiprocess
-        # self.udpate_interbal = udpate_interbal
-        # self.in_on_tsumo_channels = in_on_tsumo_channels
-        # self.in_other_dahai_channels = in_other_dahai_channels
-
-        # self.mjson_path_queue = Queue(256)
-        # self.experiences = Queue()
-
-        # self.reward_discount_rate = reward_discount_rate
-
-        # self.log_dir = log_dir
-        # self.batch_size = batch_size
-        # self.evaluate_per_update = evaluate_per_update
-        # self.session_name = session_name
-        # self.session_dir = Path(self.log_dir) / self.session_name
-
-        # self.tfboard_logger = TensorBoardLogger(
-        #     log_dir=self.log_dir, session_name=self.session_name)
 
     def train_loop(
             self,
@@ -49,8 +20,33 @@ class Trainer():
             train_config,
             model_config,
     ):
+        if train_config.model_type == "dahai":
+            self._train_dahai(
+                model,
+                dataset_queue,
+                feature_generate_process,
+                train_config,
+                model_config,
+            )
+        elif train_config.model_type == "pon":
+            self._train_dahai(
+                model,
+                dataset_queue,
+                feature_generate_process,
+                train_config,
+                model_config,
+            )
+
+    def _train_dahai(
+            self,
+            model,
+            dataset_queue,
+            feature_generate_process,
+            train_config,
+            model_config,
+    ):
         game_count = 0
-        dahai_update_count = 0
+
         # consume first observation for load
         # if load_model:
         #     agent.load(load_model, self.in_on_tsumo_channels,
@@ -58,11 +54,15 @@ class Trainer():
 
         lgs.logger_main.info("start train")
         datasets = []
-
+        chunk_length = model_config.batch_size * 10
+        replay_buffer_length = min(10000, chunk_length * 10)
+        replay_buffer = deque(maxlen=replay_buffer_length)
         while True:
-            if len(datasets) < model_config.batch_size:
+
+            if len(datasets) < chunk_length:
                 try:
                     one_mjson_dataset = dataset_queue.get(timeout=1)
+                    game_count += 1
                     datasets.extend(one_mjson_dataset)
                 except queue.Empty:
                     if not feature_generate_process.is_alive():
@@ -72,9 +72,23 @@ class Trainer():
             else:
                 lgs.logger_main.info("filled queue, start train")
                 # clear used dataset
-                train_data = datasets[:model_config.batch_size]
-                datasets = datasets[model_config.batch_size:]
+                train_data = datasets[:chunk_length]
+                datasets = datasets[chunk_length:]
+
+                replay_buffer.extend(train_data)
+                if len(replay_buffer) < replay_buffer.maxlen:
+                    lgs.logger_main.info("replay_buffer not full, continue")
+                    continue
+                replay_buffer = list(replay_buffer)
+                random.shuffle(replay_buffer)
+
+                train_data = replay_buffer[:chunk_length]
+                replay_buffer = replay_buffer[chunk_length:]
+                replay_buffer = deque(
+                    replay_buffer, maxlen=replay_buffer_length)
+
                 update_result = model.update(train_data)
+                lgs.logger_main.info(f"game count:{game_count}")
                 pprint.pprint(update_result)
 
     # def train_dahai(

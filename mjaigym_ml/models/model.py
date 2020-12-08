@@ -398,15 +398,27 @@ class DahaiModel(Model):
         dataset.label.kyoku_line_num
             その局の牌譜行数
         """
-        REWARD_BASE = 1000.0
 
         actor = dataset.label.next_action['actor']
         diffs = [
-            dataset.label.score_diff_0 / REWARD_BASE,
-            dataset.label.score_diff_1 / REWARD_BASE,
-            dataset.label.score_diff_2 / REWARD_BASE,
-            dataset.label.score_diff_3 / REWARD_BASE,
+            dataset.label.score_diff_0,
+            dataset.label.score_diff_1,
+            dataset.label.score_diff_2,
+            dataset.label.score_diff_3,
         ]
+
+        # 1000点を1とする
+        REWARD_BASE = 1000.0
+        diffs = [d / REWARD_BASE for d in diffs]
+
+        # 0.95で割引する理由
+        # * 自分のツモから次のツモまでに必要な行数：8行
+        # * 5順で報酬を1割程度まで減衰させたい
+        # → 0.95 ** (8*5) = 0.1285...
+        rate = 0.95 ** (dataset.label.kyoku_line_num -
+                        dataset.label.kyoku_line_index)
+        diffs = [d * rate for d in diffs]
+
         pre_actor = diffs[:actor]
         post_actor = diffs[actor:]
         return post_actor + pre_actor
