@@ -251,8 +251,8 @@ class FeatureAnalyser():
                 common_start_index += e.get_length()
 
             # calc reach dahai feature
-            for player_id in range(4):
-                for e in self.reach_dahai_extractors:
+            for e in self.reach_dahai_extractors:
+                for player_id in range(4):
                     target_array = reach_dahai_result_array[
                         dataset_index,
                         player_id,
@@ -263,7 +263,7 @@ class FeatureAnalyser():
                         board_state=dataset.board_state,
                         player_id=player_id,
                     )
-                    reach_dahai_start_index += e.get_length()
+                reach_dahai_start_index += e.get_length()
 
             pon_chi_kan_result_array = None
             # calc pon_chi_kan_feaature
