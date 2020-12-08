@@ -1,11 +1,9 @@
-from mjaigym.board.mj_move import MjMove
-from mjaigym.board.board_state import BoardState
-import pandas as pd
-import numpy as np
 from dataclasses import dataclass
-from typing import Dict, NamedTuple, List
-from pathlib import Path
-import random
+from typing import Dict, NamedTuple
+
+import numpy as np
+
+from mjaigym.board.board_state import BoardState
 
 
 class LabelRecord(NamedTuple):
@@ -75,38 +73,3 @@ class Dataset():
 
     def set_feature(self, feature: FeatureRecord):
         self.feature = feature
-
-
-class Datasets():
-    """
-    ラベルと盤面情報と特徴量のセット。
-    計算量削減のため特徴量はダウンサンプリング後に計算する。
-    """
-
-    def __init__(
-        self,
-        fname: Path,
-    ):
-        self.fname = fname
-        self.labels = []
-        self.board_states = []
-        self.features = []
-        self.is_calclated = False
-
-    def append(self, label: LabelRecord, board_state: BoardState):
-        self.labels.append(label)
-        self.board_states.append(board_state)
-
-    def get_rotate_pai_feature(self):
-        """
-        [m,p,s,z]の並び順についてm,p,sの入れ替えを行い、
-        全6パターン（3*2*1）を生成する。
-        """
-        pass
-
-    def get_roatete_position_feature(self):
-        """
-        下家、対面、上家の並び順について入れ替えを行い
-        全6パターンを生成する。
-        """
-        pass

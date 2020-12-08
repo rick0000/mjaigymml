@@ -31,15 +31,18 @@ def get_test_dataset(test_mjson_storage):
 
 
 def _run_onegame_analyze(args):
-    mjson, analyser, dataset_queue, train_config = args
-    datasets = analyser.analyse_mjson(mjson)
-    # extract and sampling.
-    datasets = analyser.filter_datasets(datasets, train_config)
+    try:
+        mjson, analyser, dataset_queue, train_config = args
+        datasets = analyser.analyse_mjson(mjson)
+        # extract and sampling.
+        datasets = analyser.filter_datasets(datasets, train_config)
 
-    # calc_feature() updates datasets object
-    analyser.calc_feature(datasets, train_config)
+        # calc_feature() updates datasets object
+        analyser.calc_feature(datasets, train_config)
 
-    dataset_queue.put(datasets)
+        dataset_queue.put(datasets)
+    except KeyboardInterrupt:
+        return
 
 
 def run_extract_process(
@@ -57,7 +60,7 @@ def run_extract_process(
         (mjson, analyser, dataset_queue, train_config)
         for mjson in train_mjson_storage.get_mjsons()]
 
-    cpu_num = 12
+    cpu_num = 8
     if cpu_num == 1:
         for arg in args:
             _run_onegame_analyze(arg)
@@ -82,7 +85,7 @@ def run(
 
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
-        train_mjson_dir, 20)  # 10000牌譜ファイル分抽出
+        train_mjson_dir, 100000)  # 10000牌譜ファイル分抽出
     # test_mjson_storage = LocalFileMjsonStorage(
     #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
 

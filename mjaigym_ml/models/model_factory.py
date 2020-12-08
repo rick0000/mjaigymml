@@ -1,4 +1,4 @@
-from mjaigym_ml.models.model import Head34Value1Model, Head2Model
+from mjaigym_ml.models.model import DahaiModel, Head2Model
 from mjaigym_ml.config.model_config import ModelConfig
 
 
@@ -42,7 +42,7 @@ class ModelFactory:
 
     @classmethod
     def _get_dahai_model(cls, model_config: ModelConfig, feature_length: int):
-        return Head34Value1Model(
+        return DahaiModel(
             feature_length,
             model_config.mid_channels,
             model_config.resnet_repeat,

@@ -32,7 +32,7 @@ class DfsV0(FeatureReachDahai):
         24000,
         32000,
     ]
-    DEPTH = 3
+    DEPTH = 2
 
     def __init__(self):
         self.dfs = Dfs()

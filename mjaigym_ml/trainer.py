@@ -1,6 +1,5 @@
-from collections import deque
 import queue
-
+import pprint
 
 import loggers as lgs
 
@@ -72,10 +71,11 @@ class Trainer():
                         return
             else:
                 lgs.logger_main.info("filled queue, start train")
+                # clear used dataset
                 train_data = datasets[:model_config.batch_size]
                 datasets = datasets[model_config.batch_size:]
-
-                # model.update(train_data)
+                update_result = model.update(train_data)
+                pprint.pprint(update_result)
 
     # def train_dahai(
     #         self,

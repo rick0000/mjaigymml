@@ -2,12 +2,14 @@ import os
 import gc
 from abc import ABCMeta, abstractmethod
 import numpy as np
+from typing import List
 
 import torch
 import torch.nn as nn
 
-from ml.net import Head2Net, ActorCriticNet
-
+from mjaigym.board.function.pai import Pai
+from mjaigym_ml.features.feature_analysis import Dataset, FeatureRecord
+from mjaigym_ml.models.net import Head2Net, ActorCriticNet
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -177,7 +179,7 @@ class Head2Model(Model):
         return float(total_loss / batch_num), float(acc)
 
 
-class Head34Value1Model(Model):
+class DahaiModel(Model):
     """ActorCritic教師あり打牌用モデル
     """
 
@@ -214,7 +216,10 @@ class Head34Value1Model(Model):
 
         return sl_criterion_func
 
-    def predict(self, states):
+    def predict(self, states: List[FeatureRecord]):
+        """
+        softmaxを適用した行動確率と現在の価値の予測値を返す。中間層の値を含める。
+        """
         self.model.eval()
         with torch.no_grad():
             inputs = torch.Tensor(states).float().to(DEVICE)
@@ -225,7 +230,10 @@ class Head34Value1Model(Model):
             v_mid.cpu().detach().numpy(), \
             p_mid.cpu().detach().numpy()
 
-    def policy(self, states):
+    def policy(self, states: List[FeatureRecord]):
+        """
+        softmaxを適用した行動確率を返す。
+        """
         self.model.eval()
         with torch.no_grad():
             inputs = torch.Tensor(states).float().to(DEVICE)
@@ -233,16 +241,11 @@ class Head34Value1Model(Model):
             prob = self.softmax(policy)
         return prob.cpu().detach().numpy()
 
-    def estimate_by_states(self, states):
-        states = torch.Tensor(states).float().to(DEVICE)
-        self.model.eval()
-        with torch.no_grad():
-            outputs, v_outputs = self.model(states)
-            _, predicted = torch.max(outputs.data, 1)
-        return predicted, v_outputs
-
-    def update(self, experiences):
-        batch_num = len(experiences) // self.batch_size
+    def update(self, datasets: List[Dataset]):
+        """
+        ニューラルネットの重みを更新する
+        """
+        batch_num = len(datasets) // self.batch_size
         if batch_num == 0:
             return {}
 
@@ -250,9 +253,9 @@ class Head34Value1Model(Model):
         correct = 0
         total = 0
 
-        states = np.array([e[0] for e in experiences])
-        actions = np.array([e[1] for e in experiences])
-        rewards = np.array([e[2] for e in experiences])
+        states = np.array([self._calc_feature(d) for d in datasets])
+        actions = np.array([self._calc_label(d) for d in datasets])
+        rewards = np.array([self._calc_reward(d) for d in datasets])
 
         # lgs.logger_main.info(
         #   f"start size:{sys.getsizeof(states)//(1024*1024)}MB")
@@ -297,16 +300,16 @@ class Head34Value1Model(Model):
         result["train/loss"] = float(total_loss / batch_num)
         result["train/dahai_loss"] = all_p_loss / batch_num
         result["train/value_loss"] = all_v_loss / batch_num
-
+        result["train/reward.var"] = np.var(rewards)
         var_minus_loss = (float(np.var(rewards)) - result["train/value_loss"])
         result["train/(reward.var - value_loss)÷reward.var"] = \
-            var_minus_loss / np.var(rewards)
+            var_minus_loss / result["train/reward.var"]
 
         return result
 
-    def evaluate(self, experiences):
+    def evaluate(self, datasets: List[Dataset]):
 
-        batch_num = len(experiences) // self.batch_size
+        batch_num = len(datasets) // self.batch_size
         if batch_num == 0:
             return {}
 
@@ -314,9 +317,9 @@ class Head34Value1Model(Model):
         correct = 0
         total = 0
 
-        states = np.array([e[0] for e in experiences])
-        actions = np.array([e[1] for e in experiences])
-        rewards = np.array([e[2] for e in experiences])
+        states = np.array([self._calc_feature(d) for d in datasets])
+        actions = np.array([self._calc_label(d) for d in datasets])
+        rewards = np.array([self._calc_reward(d) for d in datasets])
 
         # lgs.logger_main.info(
         #   f"start size:{sys.getsizeof(states)//(1024*1024)}MB")
@@ -357,11 +360,55 @@ class Head34Value1Model(Model):
         result["test/loss"] = float(total_loss / batch_num)
         result["test/dahai_loss"] = all_p_loss / batch_num
         result["test/value_loss"] = all_v_loss / batch_num
+        result["test/reward.var"] = np.var(rewards)
         result["test/(reward.var - value_loss)÷reward.var"] = \
             (float(np.var(rewards)) -
-             result["test/value_loss"]) / np.var(rewards)
+             result["test/value_loss"]) / result["test/reward.var"]
 
         return result
+
+    def _calc_feature(self, dataset: Dataset):
+        actor = dataset.label.next_action['actor']
+        shimocha = (actor + 1) % 4
+        toimen = (actor + 2) % 4
+        kamicha = (actor + 3) % 4
+
+        concated = np.concatenate([
+            dataset.feature.common_feature,
+            dataset.feature.reach_dahai_feature[actor],
+            dataset.feature.reach_dahai_feature[shimocha],
+            dataset.feature.reach_dahai_feature[toimen],
+            dataset.feature.reach_dahai_feature[kamicha],
+        ], axis=0)
+        return concated[:, :, np.newaxis]
+
+    def _calc_label(self, dataset: Dataset):
+        return Pai.str_to_id(dataset.label.next_action['pai'])
+
+    def _calc_reward(self, dataset: Dataset):
+        """
+        NOTE:1000点を1としている。
+
+        NOTE:以下を使えば割引報酬にすることも可能
+
+        dataset.label.kyoku_line_index
+            局の何行目まで適用済みの状態か 0-index。
+
+        dataset.label.kyoku_line_num
+            その局の牌譜行数
+        """
+        REWARD_BASE = 1000.0
+
+        actor = dataset.label.next_action['actor']
+        diffs = [
+            dataset.label.score_diff_0 / REWARD_BASE,
+            dataset.label.score_diff_1 / REWARD_BASE,
+            dataset.label.score_diff_2 / REWARD_BASE,
+            dataset.label.score_diff_3 / REWARD_BASE,
+        ]
+        pre_actor = diffs[:actor]
+        post_actor = diffs[actor:]
+        return post_actor + pre_actor
 
 
 if __name__ == "__main__":
@@ -371,7 +418,7 @@ if __name__ == "__main__":
     learning_rate = 0.01
     batch_size = 128
 
-    model = Head34Value1Model(
+    model = DahaiModel(
         in_channels,
         mid_channels,
         blocks_num,
@@ -383,8 +430,7 @@ if __name__ == "__main__":
     for _ in range(256):
         state = np.random.randint(0, 2, size=(in_channels, 34, 1))
         action = np.random.randint(34)
-        reward = np.random.randint(-100, 100)
+        reward = np.random.randint(-100, 100, (4,))
         exps.append([state, action, reward])
 
-    # import pdb; pdb.set_trace(); import time; time.sleep(1)
     model.update(exps)
