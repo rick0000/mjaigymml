@@ -4,12 +4,13 @@ from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
 from mjaigym.board import BoardState
 
 
-class DiscardRedpaiV0(FeatureReachDahai):
+class KanV0(FeatureReachDahai):
 
     def get_length(cls) -> int:
-        return 24
+        return 1
 
     def calc(self, result: np.array, board_state: BoardState, player_id: int):
-        for i, pai in enumerate(board_state.sutehais[player_id]):
-            if pai.id_red:
-                result[i, pai.id] = 1
+        player_furos = board_state.furos[player_id]
+        for furo in player_furos:
+            if furo.is_kan:
+                result[0, furo.pai_id] = 1

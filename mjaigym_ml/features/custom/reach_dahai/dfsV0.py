@@ -10,7 +10,7 @@ import numpy as np
 
 class DfsV0(FeatureReachDahai):
     """
-    先読み特徴量。
+    先読み特徴量。shanten_analy
     深さ優先探索を行い、以下の項目についてフラグを立てる
     1. ある牌を打牌後 DEPTH枚 の牌交換を行った際にある役が和了できるか。
     2. ある牌を打牌後 DEPTH枚 の牌交換を行った際にある点数が得られるか。
@@ -47,9 +47,10 @@ class DfsV0(FeatureReachDahai):
 
         player_tehai = board_state.tehais[player_id]
 
-        # ツモ番以外では計算しない
-        if len(player_tehai) % 3 != 2:
-            return
+        # # ツモ番以外では計算しない
+        # if len(player_tehai) % 3 != 2:
+        #     return
+
         nums = [0] * 34
         for t in player_tehai:
             nums[t.id] += 1

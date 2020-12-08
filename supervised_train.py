@@ -1,7 +1,5 @@
 import argparse
 import threading
-from collections import deque
-import queue
 import multiprocessing
 
 from tqdm import tqdm
@@ -10,8 +8,6 @@ from mjaigym_ml.features.feature_analyser_factory import FeatureAnalyzerFactory
 from mjaigym_ml.features.feature_analyser import FeatureAnalyser
 from mjaigym_ml.storage.local_file_mjson_storage import LocalFileMjsonStorage
 from mjaigym_ml.storage.mjson_storage import MjsonStorage
-from mjaigym_ml.storage.feature_storage_localfs \
-    import FeatureStorageLocalFs
 from mjaigym_ml.config.extract_config import ExtractConfig
 from mjaigym_ml.config.train_config import TrainConfig
 from mjaigym_ml.config.model_config import ModelConfig

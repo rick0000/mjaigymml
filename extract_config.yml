@@ -8,11 +8,17 @@ common:
 on_reach_dahai: 
   # 持ち点、手牌、副露牌などプレーヤーごとに異なる特徴量
   # すべてのアクションについて抽出する特徴量
-  ankanV0.py: AnkanV0
-  anpaiV0.py: AnpaiV0
   dfsV0.py: DfsV0
+  shantenV0.py: ShantenV0
+  tehai_numV0.py: TehaiNumV0
+  oyaV0.py: OyaV0
+  reachV0.py: ReachV0
+  chiV0.py: ChiV0
+  ponV0.py: PonV0
+  kanV0.py: KanV0
+  
 
-on_pon_chi_kan: 
+on_pon_chi_kan:
   # ポン、チー、カンのときのみ抽出する特徴量
-  pon_chi_kan_dfsV0.py: PonChiKanDfsV0
+  furo_candidateV0.py: FuroCandidateV0
 

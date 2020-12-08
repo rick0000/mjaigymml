@@ -40,8 +40,10 @@ class Model(metaclass=ABCMeta):
         self.set_state(state)
 
     def save(self, path):
-        state = {'model': self.model.state_dict(
-        ), 'optimizer': self.optimizer.state_dict()}
+        state = {
+            'model': self.model.state_dict(),
+            'optimizer': self.optimizer.state_dict()
+        }
         os.makedirs(os.path.dirname(path), exist_ok=True)
         torch.save(state, path)
 
@@ -278,7 +280,6 @@ class DahaiModel(Model):
             policy_loss, value_loss = self.criterion(
                 outputs, targets, v_outputs, v_targets)
             loss = policy_loss + value_loss
-            # loss = value_loss
 
             all_p_loss += policy_loss.detach()
             all_v_loss += value_loss.detach()

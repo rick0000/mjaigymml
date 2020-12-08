@@ -10,7 +10,7 @@ class DoraV0(FeatureCommon):
     def get_length(cls) -> int:
         return 4
 
-    def calc(cls, result: np.array, board_state: BoardState):
+    def calc(self, result: np.array, board_state: BoardState):
         dora_markers = board_state.dora_markers
         nums = {}
         for dora_maker in dora_markers:
