@@ -106,7 +106,14 @@ def run(
 
     # 特徴量消費側定義
     # モデル定義
-    model = None
+    from mjaigym_ml.models.model_factory import ModelFactory
+
+    model = ModelFactory.get_model(
+        model_type,
+        model_config,
+        analyser.get_reach_dahai_feature_length(),
+        analyser.get_pon_chi_kan_feature_length(),
+    )
     # 学習の定義
     from mjaigym_ml.trainer import Trainer
     trainer = Trainer()

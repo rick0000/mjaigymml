@@ -70,6 +70,15 @@ class FeatureAnalyser():
         self.pon_chi_kan_length = sum(
             [f.get_length() for f in self.pon_chi_kan_extractors])
 
+    def get_reach_dahai_feature_length(self):
+        return self.common_length\
+            + self.reach_dahai_length * 4
+
+    def get_pon_chi_kan_feature_length(self):
+        return self.common_length\
+            + self.reach_dahai_length * 4\
+            + self.pon_chi_kan_length * 4
+
     def reset_extractor_state(self):
         """
         キャッシュなど内部状態のリセット

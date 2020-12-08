@@ -74,7 +74,7 @@ class Model(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class Head2SlModel(Model):
+class Head2Model(Model):
     """立直、チー、ポン、カン用モデル
     """
 
@@ -177,7 +177,7 @@ class Head2SlModel(Model):
         return float(total_loss / batch_num), float(acc)
 
 
-class Head34Value1SlModel(Model):
+class Head34Value1Model(Model):
     """ActorCritic教師あり打牌用モデル
     """
 
@@ -371,7 +371,7 @@ if __name__ == "__main__":
     learning_rate = 0.01
     batch_size = 128
 
-    model = Head34Value1SlModel(
+    model = Head34Value1Model(
         in_channels,
         mid_channels,
         blocks_num,
