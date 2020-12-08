@@ -10,7 +10,10 @@ class LocalFileMjsonStorage(MjsonStorage):
         self.max_num = max_num
 
     def get_mjsons(self) -> Generator[None, Mjson, None]:
-        for index, mjson in enumerate(Path(self.input_dir).glob("**/*.mjson")):
-            if self.max_num != -1 and index >= self.max_num:
-                break
-            yield mjson
+        count = 0
+        while True:
+            for index, mjson in enumerate(Path(self.input_dir).glob("**/*.mjson")):
+                count += 1
+                if self.max_num != -1 and count >= self.max_num:
+                    break
+                yield mjson

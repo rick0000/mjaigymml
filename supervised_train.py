@@ -53,22 +53,29 @@ def run_extract_process(
     """
 
     lgs.info("start extract process")
-    args = [
-        (mjson, analyser, dataset_queue, train_config)
-        for mjson in train_mjson_storage.get_mjsons()]
 
     cpu_num = multiprocessing.cpu_count()
-    # cpu_num = 1 # for debug
+    # cpu_num = 1  # for debug
 
     if cpu_num == 1:
-        for arg in args:
+        for mjson in train_mjson_storage.get_mjsons():
+            arg = (mjson, analyser, dataset_queue, train_config)
             _run_onegame_analyze(arg)
     else:
-        with multiprocessing.Pool(processes=cpu_num) as pool:
-            with tqdm(total=len(args)) as t:
-                for _ in pool.imap_unordered(_run_onegame_analyze, args):
-                    # pass
-                    t.update(1)
+        one_chunk = []
+        for mjson in train_mjson_storage.get_mjsons():
+            one_chunk.append((mjson, analyser, dataset_queue, train_config))
+
+            if len(one_chunk) < 1024:
+                continue
+
+            with multiprocessing.Pool(processes=cpu_num) as pool:
+                with tqdm(total=train_mjson_storage.max_num) as t:
+                    for _ in pool.imap_unordered(_run_onegame_analyze,
+                                                 one_chunk):
+                        pass
+                        t.update(1)
+            one_chunk.clear()
 
 
 def run(
@@ -84,7 +91,7 @@ def run(
 
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
-        train_mjson_dir, 1000000)  # 10000牌譜ファイル分抽出
+        train_mjson_dir, 400000)  # 10000牌譜ファイル分抽出
     # test_mjson_storage = LocalFileMjsonStorage(
     #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
 
@@ -93,9 +100,9 @@ def run(
 
     # トレーニングデータセット連携用キュー
     m = multiprocessing.Manager()
-    # 1ゲーム分のリストオブジェクトを突っ込むのでcpu数だけ用意すればOK
+    # 1ゲーム分のリストオブジェクトを突っ込むのでcpu数の定数倍用意すればOK
     dataset_queue = m.Queue(
-        maxsize=multiprocessing.cpu_count())
+        maxsize=multiprocessing.cpu_count()*2)
 
     # トレーニングデータセット抽出プロセス起動
     p = threading.Thread(

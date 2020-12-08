@@ -2,8 +2,10 @@ import queue
 import pprint
 import random
 from collections import deque
+from pathlib import Path
 
 import loggers as lgs
+from mjaigym_ml.models.model import Model
 
 
 class Trainer():
@@ -14,7 +16,7 @@ class Trainer():
 
     def train_loop(
             self,
-            model,
+            model: Model,
             dataset_queue,
             feature_generate_process,
             train_config,
@@ -39,14 +41,14 @@ class Trainer():
 
     def _train_dahai(
             self,
-            model,
+            model: Model,
             dataset_queue,
             feature_generate_process,
             train_config,
             model_config,
     ):
         game_count = 0
-
+        update_count = 0
         # consume first observation for load
         # if load_model:
         #     agent.load(load_model, self.in_on_tsumo_channels,
@@ -90,6 +92,13 @@ class Trainer():
                 update_result = model.update(train_data)
                 lgs.logger_main.info(f"game count:{game_count}")
                 pprint.pprint(update_result)
+
+                update_count += 1
+                if update_count % 20 == 0:
+                    lgs.logger_main.info("save model")
+                    output_path = Path(f"output/model/{game_count}.pth")
+                    output_path.parent.mkdir(parents=True, exist_ok=True)
+                    model.save(output_path)
 
     # def train_dahai(
     #         self,

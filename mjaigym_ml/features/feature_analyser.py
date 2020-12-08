@@ -248,6 +248,7 @@ class FeatureAnalyser():
                     result=target_array,
                     board_state=dataset.board_state,
                 )
+                common_start_index += e.get_length()
 
             # calc reach dahai feature
             for player_id in range(4):
@@ -262,7 +263,9 @@ class FeatureAnalyser():
                         board_state=dataset.board_state,
                         player_id=player_id,
                     )
+                    reach_dahai_start_index += e.get_length()
 
+            pon_chi_kan_result_array = None
             # calc pon_chi_kan_feaature
             if dataset.label.pon or dataset.label.chi or dataset.label.kan:
                 # 出現する場合のみメモリ確保
@@ -280,12 +283,13 @@ class FeatureAnalyser():
                         player_id=dataset.candidate_furo_action['actor'],
                         candidate_furo_action=dataset.candidate_furo_action
                     )
+                    pon_chi_kan_index += e.get_length()
 
             # update result object
             feature = FeatureRecord(
                 common_result_array[dataset_index],
                 reach_dahai_result_array[dataset_index],
-                None
+                pon_chi_kan_result_array
             )
             dataset.set_feature(feature)
 
