@@ -63,19 +63,19 @@ def run_extract_process(
             _run_onegame_analyze(arg)
     else:
         one_chunk = []
-        for mjson in train_mjson_storage.get_mjsons():
-            one_chunk.append((mjson, analyser, dataset_queue, train_config))
+        with tqdm(total=train_mjson_storage.max_num) as t:
+            for mjson in train_mjson_storage.get_mjsons():
+                one_chunk.append(
+                    (mjson, analyser, dataset_queue, train_config))
 
-            if len(one_chunk) < 1024:
-                continue
+                if len(one_chunk) < 256:
+                    continue
 
-            with multiprocessing.Pool(processes=cpu_num) as pool:
-                with tqdm(total=train_mjson_storage.max_num) as t:
+                with multiprocessing.Pool(processes=cpu_num) as pool:
                     for _ in pool.imap_unordered(_run_onegame_analyze,
                                                  one_chunk):
-                        pass
                         t.update(1)
-            one_chunk.clear()
+                one_chunk.clear()
 
 
 def run(
