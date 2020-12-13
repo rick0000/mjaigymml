@@ -411,12 +411,9 @@ class DahaiModel(Model):
         REWARD_BASE = 1000.0
         diffs = [d / REWARD_BASE for d in diffs]
 
-        # 0.95で割引する理由
-        # * 自分のツモから次のツモまでに必要な行数：8行
-        # * 5順で報酬を1割程度まで減衰させたい
-        # → 0.95 ** (8*5) = 0.1285...
-        rate = 0.95 ** (dataset.label.kyoku_line_num -
-                        dataset.label.kyoku_line_index)
+        # 割引
+        rate = 0.995 ** (dataset.label.kyoku_line_num -
+                         dataset.label.kyoku_line_index)
         diffs = [d * rate for d in diffs]
 
         pre_actor = diffs[:actor]
