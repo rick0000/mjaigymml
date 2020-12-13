@@ -223,7 +223,7 @@ class DahaiModel(Model):
         softmaxを適用した行動確率と現在の価値の予測値を返す。中間層の値を含める。
         """
         states = np.array([self._calc_feature(d) for d in datasets])
-    
+
         self.model.eval()
         with torch.no_grad():
             inputs = torch.Tensor(states).float().to(DEVICE)
@@ -373,9 +373,13 @@ class DahaiModel(Model):
         return result
 
     def _calc_feature(self, dataset: Dataset):
-        if dataset.board_state.previous_action["type"] == "tsumo":
-            actor = dataset.board_state.previous_action['actor']    
+        if dataset.label.next_action_type is not None:
+            actor = dataset.label.next_action['actor']
+        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
+            actor = dataset.board_state.previous_action['actor']
         else:
+            import pdb
+            pdb.set_trace()
             raise Exception("not implemented")
         shimocha = (actor + 1) % 4
         toimen = (actor + 2) % 4
