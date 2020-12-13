@@ -35,7 +35,7 @@ def _run_onegame_analyze(args):
         if len(datasets) == 0:
             return
         # calc_feature() updates datasets object
-        analyser.calc_feature(datasets, train_config)
+        analyser.calc_feature(datasets)
 
         dataset_queue.put(datasets)
     except KeyboardInterrupt:
