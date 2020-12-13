@@ -4,13 +4,13 @@ import multiprocessing
 
 from tqdm import tqdm
 
-from mjaigym_ml.features.feature_analyser_factory import FeatureAnalyzerFactory
-from mjaigym_ml.features.feature_analyser import FeatureAnalyser
-from mjaigym_ml.storage.local_file_mjson_storage import LocalFileMjsonStorage
-from mjaigym_ml.storage.mjson_storage import MjsonStorage
-from mjaigym_ml.config.extract_config import ExtractConfig
-from mjaigym_ml.config.train_config import TrainConfig
-from mjaigym_ml.config.model_config import ModelConfig
+from mjaigymml.features.feature_analyser_factory import FeatureAnalyzerFactory
+from mjaigymml.features.feature_analyser import FeatureAnalyser
+from mjaigymml.storage.local_file_mjson_storage import LocalFileMjsonStorage
+from mjaigymml.storage.mjson_storage import MjsonStorage
+from mjaigymml.config.extract_config import ExtractConfig
+from mjaigymml.config.train_config import TrainConfig
+from mjaigymml.config.model_config import ModelConfig
 from loggers import logger_main as lgs
 
 
@@ -117,7 +117,7 @@ def run(
 
     # 特徴量消費側定義
     # モデル定義
-    from mjaigym_ml.models.model_factory import ModelFactory
+    from mjaigymml.models.model_factory import ModelFactory
 
     model = ModelFactory.get_model(
         model_type,
@@ -126,7 +126,7 @@ def run(
         analyser.get_pon_chi_kan_feature_length(),
     )
     # 学習の定義
-    from mjaigym_ml.trainer import Trainer
+    from mjaigymml.trainer import Trainer
     trainer = Trainer()
     # 学習の実行
     trainer.train_loop(
