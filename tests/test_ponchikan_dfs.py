@@ -10,10 +10,10 @@ from mjaigym.board.function.efficient_dfs import Dfs
 from mjaigym.board.function.rs_shanten_analysis import RsShantenAnalysis
 from mjaigym.board import Board
 from mjaigym.board import BoardState
-from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
+from mjaigymml.features.custom.feature_reach_dahai import FeatureReachDahai
 
 
-from mjaigym_ml.features.custom.pon_chi_kan.pon_chi_kan_dfsV0 import PonChiKanDfsV0
+from mjaigymml.features.custom.pon_chi_kan.pon_chi_kan_dfsV0 import PonChiKanDfsV0
 
 
 def test_pon_chi_kan_dfs():

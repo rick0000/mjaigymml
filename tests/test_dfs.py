@@ -10,10 +10,10 @@ from mjaigym.board.function.efficient_dfs import Dfs
 from mjaigym.board.function.rs_shanten_analysis import RsShantenAnalysis
 from mjaigym.board import Board
 from mjaigym.board import BoardState
-from mjaigym_ml.features.custom.feature_reach_dahai import FeatureReachDahai
+from mjaigymml.features.custom.feature_reach_dahai import FeatureReachDahai
 
 
-from mjaigym_ml.features.custom.reach_dahai.dfsV0 import DfsV0
+from mjaigymml.features.custom.reach_dahai.dfsV0 import DfsV0
 
 
 def test_horapoint_dfs():
