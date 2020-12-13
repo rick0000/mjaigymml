@@ -95,7 +95,75 @@ class FeatureAnalyser():
         辞書のリストで与えられたアクションの履歴について特徴量の算出を行う。
         全アクションではなく最後の状態についてのみ特徴量の算出を行う。
         """
-        raise NotImplementedError()
+        board = ArchiveBoard()
+        datasets = []
+        # 最終行の盤面状態作成
+        for kyoku_line_index, action in enumerate(mjson_list):
+            board.step(action)
+
+        board_state = board.get_state()
+        dahai, reach, pon, chi, kan = self._possible_action_types(
+                board_state, None)
+
+        start_kyoku_line = mjson_list[0]
+        assert start_kyoku_line["type"] == "start_kyoku"
+
+        label_record = LabelRecord(
+            filename="",
+            mjson_line_index=len(mjson_list)-1,
+            kyoku_line_index=len(mjson_list)-1,
+            kyoku_line_num=len(mjson_list),
+            kyoku_index=start_kyoku_line["kyoku"],
+            kyoku=start_kyoku_line["kyoku"],
+            bakaze=start_kyoku_line["bakaze"],
+            honba=start_kyoku_line["honba"],
+            kyotaku=start_kyoku_line["kyotaku"],
+            dahai=dahai,
+            reach=reach,
+            chi=chi,
+            pon=pon,
+            kan=kan,
+
+            score_diff_0=0,
+            score_diff_1=0,
+            score_diff_2=0,
+            score_diff_3=0,
+
+            initial_score_0=25000,
+            initial_score_1=25000,
+            initial_score_2=25000,
+            initial_score_3=25000,
+
+            end_score_0=25000,
+            end_score_1=25000,
+            end_score_2=25000,
+            end_score_3=25000,
+
+            next_action_type=None, 
+            next_action=None,
+            candidate_action_type=None,  # 打牌では利用しないカラム
+            next_and_candidate_is_same=None,  # 打牌では利用しないカラム
+            candidate_action=None,  # 打牌では利用しないカラム
+        )
+
+        if pon or chi or kan:
+            # TODO:LabelRecordに追加
+            # candidate_action_type=None,  # 打牌では利用しないカラム
+            # next_and_candidate_is_same=None,  # 打牌では利用しないカラム
+            # candidate_action=None,  # 打牌では利用しないカラム
+            for player_id in range(4):
+                for possible_action in board_state.possible_actions[player_id]:
+                    if possible_action['type'] in ["pon", "chi", "ankan", "kakan", "daiminkan"]:
+                        # 1副露アクション候補に対して1レコード発生
+                        dataset = Dataset(
+                            label_record, board_state, possible_action)
+                        datasets.append(dataset)
+        else:
+            # 1行に対して1レコード発生
+            dataset = Dataset(label_record, board_state)
+            datasets.append(dataset)
+
+        return datasets
 
     def analyse_mjson(
         self,
@@ -228,7 +296,7 @@ class FeatureAnalyser():
 
         return records
 
-    def calc_feature(self, datasets: List[Dataset], train_config: TrainConfig):
+    def calc_feature(self, datasets: List[Dataset]):
         common_result_array = np.zeros(
             (len(datasets), self.common_length, 34))
 
@@ -309,10 +377,15 @@ class FeatureAnalyser():
         chi = False
         kan = False
 
-        if next_action["type"] == "dahai" and \
-                (not state.reach[next_action["actor"]]):
-            dahai = True
-
+        if next_action:
+            if next_action["type"] == "dahai" and \
+                    (not state.reach[next_action["actor"]]):
+                dahai = True
+        else:
+            if state.previous_action["type"] == "dahai" and \
+                    (not state.reach[next_action["actor"]]):
+                dahai = True
+                
         # other check
         for player_actions in state.possible_actions.values():
             for action in player_actions:

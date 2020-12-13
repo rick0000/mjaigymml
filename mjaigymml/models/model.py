@@ -218,10 +218,12 @@ class DahaiModel(Model):
 
         return sl_criterion_func
 
-    def predict(self, states: List[FeatureRecord]):
+    def predict(self, datasets: List[Dataset]):
         """
         softmaxを適用した行動確率と現在の価値の予測値を返す。中間層の値を含める。
         """
+        states = np.array([self._calc_feature(d) for d in datasets])
+    
         self.model.eval()
         with torch.no_grad():
             inputs = torch.Tensor(states).float().to(DEVICE)
@@ -232,10 +234,12 @@ class DahaiModel(Model):
             v_mid.cpu().detach().numpy(), \
             p_mid.cpu().detach().numpy()
 
-    def policy(self, states: List[FeatureRecord]):
+    def policy(self, datasets: List[Dataset]):
         """
         softmaxを適用した行動確率を返す。
         """
+        states = np.array([self._calc_feature(d) for d in datasets])
+
         self.model.eval()
         with torch.no_grad():
             inputs = torch.Tensor(states).float().to(DEVICE)
@@ -369,7 +373,10 @@ class DahaiModel(Model):
         return result
 
     def _calc_feature(self, dataset: Dataset):
-        actor = dataset.label.next_action['actor']
+        if dataset.board_state.previous_action["type"] == "tsumo":
+            actor = dataset.board_state.previous_action['actor']    
+        else:
+            raise Exception("not implemented")
         shimocha = (actor + 1) % 4
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
