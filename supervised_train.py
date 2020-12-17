@@ -79,14 +79,13 @@ def run_extract_process(
 
 
 def run(
-        model_type,
         train_mjson_dir,
         test_mjson_dir,
         extract_config,
         model_config,
         train_config,
         model_save_dir,
-        model_dir,
+        load_model_file,
 ):
 
     # 牌譜読み込み定義
@@ -96,7 +95,9 @@ def run(
     #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
 
     # 牌譜解析の設定
-    analyser = FeatureAnalyzerFactory.get_analyzer(model_type, extract_config)
+    analyser = FeatureAnalyzerFactory.get_analyzer(
+        train_config.model_type, 
+        extract_config)
 
     # トレーニングデータセット連携用キュー
     m = multiprocessing.Manager()
@@ -120,7 +121,7 @@ def run(
     from mjaigymml.models.model_factory import ModelFactory
 
     model = ModelFactory.get_model(
-        model_type,
+        train_config.model_type,
         model_config,
         analyser.get_reach_dahai_feature_length(),
         analyser.get_pon_chi_kan_feature_length(),
@@ -134,7 +135,9 @@ def run(
         dataset_queue,
         p,
         train_config,
-        model_config
+        model_config,
+        model_save_dir,
+        load_model_file
     )
 
     p.join()
@@ -142,7 +145,6 @@ def run(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_type", type=str, default="dahai")
     parser.add_argument("--train_mjson_dir", type=str,
                         default="/data/mjson/train/")
     parser.add_argument("--test_mjson_dir", type=str,
@@ -155,7 +157,7 @@ if __name__ == "__main__":
                         default="train_config.yml")
     parser.add_argument("--model_save_dir", type=str,
                         default="output/model")
-    parser.add_argument("--model_dir", type=str, default=None)
+    parser.add_argument("--load_model_file", type=str, default=None)
 
     arg = parser.parse_args()
 
@@ -164,12 +166,11 @@ if __name__ == "__main__":
     train_config = TrainConfig.load(arg.train_config)
 
     run(
-        arg.model_type,
         arg.train_mjson_dir,
         arg.test_mjson_dir,
         extract_config,
         model_config,
         train_config,
         arg.model_save_dir,
-        arg.model_dir,
+        arg.load_model_file,
     )

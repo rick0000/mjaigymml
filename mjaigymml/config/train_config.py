@@ -17,7 +17,7 @@ class TrainConfig(ConfigBase):
 
     sampling_rate: float (0.0, 1.0]
         打牌学習時に使用する局面数の割合。
-        1.0だと学習に使用可能な全局面を使って学習を行う。
+        1.0の場合は使用可能な全局面を使って学習を行う。
     """
     model_type: str
     sampling_rate: float

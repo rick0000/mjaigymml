@@ -21,6 +21,8 @@ class Trainer():
             feature_generate_process,
             train_config,
             model_config,
+            model_save_dir,
+            load_model_file,
     ):
         if train_config.model_type == "dahai":
             self._train_dahai(
@@ -29,6 +31,8 @@ class Trainer():
                 feature_generate_process,
                 train_config,
                 model_config,
+                model_save_dir,
+                load_model_file,
             )
         elif train_config.model_type == "pon":
             self._train_dahai(
@@ -37,6 +41,8 @@ class Trainer():
                 feature_generate_process,
                 train_config,
                 model_config,
+                model_save_dir,
+                load_model_file,
             )
 
     def _train_dahai(
@@ -46,13 +52,14 @@ class Trainer():
             feature_generate_process,
             train_config,
             model_config,
+            model_save_dir,
+            load_model_file,
     ):
         game_count = 0
         update_count = 0
-        # consume first observation for load
-        # if load_model:
-        #     agent.load(load_model, self.in_on_tsumo_channels,
-        #                self.in_other_dahai_channels)
+
+        if load_model_file:
+            model.load(load_model_file)
 
         lgs.logger_main.info("start train")
         datasets = []
@@ -96,39 +103,7 @@ class Trainer():
                 update_count += 1
                 if update_count % 20 == 0:
                     lgs.logger_main.info("save model")
-                    output_path = Path(f"output/model/{game_count}.pth")
+                    output_path = Path(model_save_dir / model_type / f"{game_count}.pth")
                     output_path.parent.mkdir(parents=True, exist_ok=True)
                     model.save(output_path)
 
-    # def train_dahai(
-    #         self,
-    #         dahai_state_action_rewards: StateActionRewards,
-    #         agent: MjAgent,
-    #         game_count: int):
-    #     result = agent.update_dahai(dahai_state_action_rewards)
-    #     lgs.logger_main.info("update result")
-    #     for key, value in result.items():
-    #         lgs.logger_main.info(f"{key}:{value:.03f}")
-    #     for key, value in result.items():
-    #         self.tfboard_logger.write(key, value, game_count)
-    #     rs = np.array([r[2] for r in dahai_state_action_rewards])
-    #     lgs.logger_main.info(
-    #         f"rewards var:{np.var(rs):.03f}, max:{rs.max():.03f}, min:{rs.min():.03f}, mean:{rs.mean():.03f}")
-
-    # def evaluate_dahai(
-    #         self,
-    #         dahai_state_action_rewards: StateActionRewards,
-    #         agent: MjAgent,
-    #         game_count: int):
-    #     lgs.logger_main.info("-------------------------------------")
-    #     lgs.logger_main.info("test result")
-    #     result = agent.evaluate_dahai(dahai_state_action_rewards)
-    #     for key, value in result.items():
-    #         lgs.logger_main.info(f"{key}:{value:.03f}")
-
-    #     for key, value in result.items():
-    #         self.tfboard_logger.write(key, value, game_count)
-    #     rs = np.array([r[2] for r in dahai_state_action_rewards])
-    #     lgs.logger_main.info(
-    #         f"rewards var:{np.var(rs):.03f}, max:{rs.max():.03f}, min:{rs.min():.03f}, mean:{rs.mean():.03f}")
-    #     lgs.logger_main.info("-------------------------------------")

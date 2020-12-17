@@ -15,5 +15,8 @@ class LocalFileMjsonStorage(MjsonStorage):
             for index, mjson in enumerate(Path(self.input_dir).glob("**/*.mjson")):
                 count += 1
                 if self.max_num != -1 and count >= self.max_num:
-                    break
+                    return
                 yield mjson
+
+            if self.max_num == -1:
+                return

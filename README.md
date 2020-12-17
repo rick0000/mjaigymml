@@ -25,20 +25,18 @@
     
 
 ## 使用方法
-* 教師あり学習
+* 教師あり学習  
 NOTE:打牌モデルのみ実装済み
 ```
 # 学習
 python supervised_train.py \
-    --model_type <学習するモデルの種類を文字列で指定(dahai, reach, pon, chi, kan)> \
     --train_mjson_dir <学習用牌譜フォルダ> \
     --test_mjson_dir <テスト用牌譜フォルダ> \
     --extract_config <特徴量抽出コンフィグファイルのパス> \
     --model_config <モデル構成コンフィグファイルのパス> \
     --train_config <学習用パラメータコンフィグファイルのパス> \
     --model_save_dir <モデルファイルを保存するディレクトリのパス> \
-    --model_dir <[option](未実装のため動作しない)既存モデルファイルが保存されているディレクトリのパス>
-    
+    --load_model_file <[option](未実装のため動作しない)再学習に使用する既存モデルファイルのパス>
 
 ```
 
