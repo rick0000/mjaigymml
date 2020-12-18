@@ -55,6 +55,7 @@ class FeatureRecord():
     """
     common_feature: np.array
     reach_dahai_feature: Dict[int, np.array]  # 席、特徴量の辞書
+    reach_dahai_oracle_feature: Dict[int, np.array]  # 席、特徴量の辞書
     pon_chi_kan_feature: Dict[int, np.array]  # 席、特徴量の辞書
 
 

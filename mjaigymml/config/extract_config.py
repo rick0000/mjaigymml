@@ -29,6 +29,7 @@ class ExtractConfig(ConfigBase):
     """
     common: Dict[str, str]
     on_reach_dahai: Dict[str, str]
+    on_reach_dahai_oracle: Dict[str, str]
     on_pon_chi_kan: Dict[str, str]
 
     def __init__(self, config):
@@ -36,17 +37,21 @@ class ExtractConfig(ConfigBase):
             raise Exception("key common not found")
         if "on_reach_dahai" not in config:
             raise Exception("key on_reach_dahai not found")
+        if "on_reach_dahai_oracle" not in config:
+            raise Exception("key on_reach_dahai_oracle not found")
         if "on_pon_chi_kan" not in config:
             raise Exception("key on_pon_chi_kan not found")
 
         self.common = config["common"]
         self.on_reach_dahai = config["on_reach_dahai"]
+        self.on_reach_dahai_oracle = config["on_reach_dahai_oracle"]
         self.on_pon_chi_kan = config["on_pon_chi_kan"]
 
     def save(self, path: Path):
         output_dic = {
             "common": self.common,
             "on_reach_dahai": self.on_reach_dahai,
+            "on_reach_dahai_oracle": self.on_reach_dahai_oracle,
             "on_pon_chi_kan": self.on_pon_chi_kan,
         }
         with open(path, "wt") as f:
@@ -62,6 +67,7 @@ if __name__ == "__main__":
         config = {
             "common": {},
             "on_reach_dahai": {},
+            "on_reach_dahai_oracle": {},
             "on_pon_chi_kan": {},
         }
         config = ExtractConfig(config)

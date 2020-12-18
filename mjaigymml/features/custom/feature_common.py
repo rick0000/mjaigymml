@@ -16,6 +16,7 @@ from mjaigym.board import BoardState
 class FeatureCommon(metaclass=ABCMeta):
     """
     盤面情報をもとに特徴量を計算するクラス
+    場風、本場など4人に共通する情報を記載する
     """
     @abstractclassmethod
     def get_length(cls) -> int:

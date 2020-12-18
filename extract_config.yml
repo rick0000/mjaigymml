@@ -8,9 +8,6 @@ common:
 on_reach_dahai: 
   # 持ち点、手牌、副露牌などプレーヤーごとに異なる特徴量
   # すべてのアクションについて抽出する特徴量
-  dfsV0.py: DfsV0
-  shantenV0.py: ShantenV0
-  tehai_numV0.py: TehaiNumV0
   oyaV0.py: OyaV0
   reachV0.py: ReachV0
   chiV0.py: ChiV0
@@ -19,6 +16,12 @@ on_reach_dahai:
   discardV0.py: DiscardV0
   discard_reach_stateV0.py: DiscardReachStateV0
   anpaiV0.py: AnpaiV0
+
+on_reach_dahai_oracle: 
+  # oracle特徴量
+  dfsV0.py: DfsV0
+  shantenV0.py: ShantenV0
+  tehai_numV0.py: TehaiNumV0
   rest_pai_in_viewV0: RestPaiInViewV0
 
 

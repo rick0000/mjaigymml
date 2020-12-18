@@ -4,11 +4,12 @@ from mjaigym.board.function.yaku_name import YAKU_CHANNEL_MAP
 from mjaigym.board.function.efficient_dfs import Dfs
 from mjaigym.board.function.rs_shanten_analysis import RsShantenAnalysis
 from mjaigym.board import BoardState
-from mjaigymml.features.custom.feature_reach_dahai import FeatureReachDahai
+from mjaigymml.features.custom.feature_reach_dahai_oracle \
+    import FeatureReachDahaiOracle
 import numpy as np
 
 
-class DfsV0(FeatureReachDahai):
+class DfsV0(FeatureReachDahaiOracle):
     """
     先読み特徴量。shanten_analy
     深さ優先探索を行い、以下の項目についてフラグを立てる
@@ -38,6 +39,7 @@ class DfsV0(FeatureReachDahai):
         self.dfs = Dfs()
         self.shanten_analysis = RsShantenAnalysis()
 
+    @classmethod
     def get_length(cls) -> int:
         yaku_ch = len(YAKU_CHANNEL_MAP) * cls.DEPTH
         point_ch = len(cls.target_points) * cls.DEPTH

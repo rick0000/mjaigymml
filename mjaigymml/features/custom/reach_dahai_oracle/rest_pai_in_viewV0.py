@@ -1,11 +1,12 @@
 import numpy as np
 
 from mjaigym.board.mj_move import MjMove
-from mjaigymml.features.custom.feature_reach_dahai import FeatureReachDahai
+from mjaigymml.features.custom.feature_reach_dahai_oracle \
+    import FeatureReachDahaiOracle
 from mjaigym.board import BoardState
 
 
-class RestPaiInViewV0(FeatureReachDahai):
+class RestPaiInViewV0(FeatureReachDahaiOracle):
 
     def get_length(cls) -> int:
         return 4

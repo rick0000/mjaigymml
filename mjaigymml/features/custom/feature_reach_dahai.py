@@ -16,6 +16,8 @@ from mjaigym.board import BoardState
 class FeatureReachDahai(metaclass=ABCMeta):
     """
     盤面情報をもとに特徴量を計算するクラス
+    手牌など4人ごとに異なる情報を記載する
+
     """
     @abstractclassmethod
     def get_length(cls) -> int:

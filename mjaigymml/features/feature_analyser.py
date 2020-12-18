@@ -12,6 +12,7 @@ from mjaigymml.config.extract_config import ExtractConfig
 from mjaigymml.config.train_config import TrainConfig
 from mjaigymml.features.custom.feature_common import FeatureCommon
 from mjaigymml.features.custom.feature_reach_dahai import FeatureReachDahai
+from mjaigymml.features.custom.feature_reach_dahai_oracle import FeatureReachDahaiOracle
 from mjaigymml.features.custom.feature_pon_chi_kan import FeaturePonChiKan
 from mjaigymml.features.feature_analysis \
     import LabelRecord, FeatureRecord, Dataset
@@ -26,6 +27,7 @@ class FeatureAnalyser():
         self.extract_config = extract_config
         self.common_extractors = []
         self.reach_dahai_extractors = []
+        self.reach_dahai_oracle_extractors = []
         self.pon_chi_kan_extractors = []
 
         # configで指定された特徴量抽出クラスをimportする
@@ -52,6 +54,16 @@ class FeatureAnalyser():
             assert isinstance(class_instance, FeatureReachDahai)
             self.reach_dahai_extractors.append(class_instance)
 
+        for module_name, target_class_name in \
+                self.extract_config.on_reach_dahai_oracle.items():
+            target_class = self._get_module_class(
+                "reach_dahai_oracle",
+                module_name,
+                target_class_name)
+            class_instance = target_class()
+            assert isinstance(class_instance, FeatureReachDahaiOracle)
+            self.reach_dahai_oracle_extractors.append(class_instance)
+
         # ポンチーカン用特徴量のimport
         for module_name, target_class_name in \
                 self.extract_config.on_pon_chi_kan.items():
@@ -67,16 +79,20 @@ class FeatureAnalyser():
             [f.get_length() for f in self.common_extractors])
         self.reach_dahai_length = sum(
             [f.get_length() for f in self.reach_dahai_extractors])
+        self.reach_dahai_oracle_length = sum(
+            [f.get_length() for f in self.reach_dahai_oracle_extractors])
         self.pon_chi_kan_length = sum(
             [f.get_length() for f in self.pon_chi_kan_extractors])
 
     def get_reach_dahai_feature_length(self):
         return self.common_length\
-            + self.reach_dahai_length * 4
+            + self.reach_dahai_length * 4\
+            + self.reach_dahai_oracle_length * 4
 
     def get_pon_chi_kan_feature_length(self):
         return self.common_length\
             + self.reach_dahai_length * 4\
+            + self.reach_dahai_oracle_length * 4\
             + self.pon_chi_kan_length * 4
 
     def reset_extractor_state(self):
@@ -86,6 +102,8 @@ class FeatureAnalyser():
         for extractor in self.common_extractors:
             extractor.reset()
         for extractor in self.reach_dahai_extractors:
+            extractor.reset()
+        for extractor in self.reach_dahai_oracle_extractors:
             extractor.reset()
         for extractor in self.pon_chi_kan_extractors:
             extractor.reset()
@@ -302,10 +320,12 @@ class FeatureAnalyser():
 
         reach_dahai_result_array = np.zeros(
             (len(datasets), 4, self.reach_dahai_length, 34))
+        reach_dahai_oracle_result_array = np.zeros(
+            (len(datasets), 4, self.reach_dahai_oracle_length, 34))
 
         for dataset_index, dataset in enumerate(datasets):
             common_start_index = 0
-            reach_dahai_start_index = 0
+
             # calc common feature
             for e in self.common_extractors:
                 target_array = common_result_array[
@@ -319,6 +339,7 @@ class FeatureAnalyser():
                 common_start_index += e.get_length()
 
             # calc reach dahai feature
+            reach_dahai_start_index = 0
             for e in self.reach_dahai_extractors:
                 for player_id in range(4):
                     target_array = reach_dahai_result_array[
@@ -332,6 +353,22 @@ class FeatureAnalyser():
                         player_id=player_id,
                     )
                 reach_dahai_start_index += e.get_length()
+
+            # calc reach dahai oracle feature
+            reach_dahai_oracle_start_index = 0
+            for e in self.reach_dahai_oracle_extractors:
+                for player_id in range(4):
+                    target_array = reach_dahai_oracle_result_array[
+                        dataset_index,
+                        player_id,
+                        reach_dahai_oracle_start_index:reach_dahai_oracle_start_index + e.get_length(),
+                        :]
+                    e.calc(
+                        result=target_array,
+                        board_state=dataset.board_state,
+                        player_id=player_id,
+                    )
+                reach_dahai_oracle_start_index += e.get_length()
 
             pon_chi_kan_result_array = None
             # calc pon_chi_kan_feaature
@@ -357,6 +394,7 @@ class FeatureAnalyser():
             feature = FeatureRecord(
                 common_result_array[dataset_index],
                 reach_dahai_result_array[dataset_index],
+                reach_dahai_oracle_result_array[dataset_index],
                 pon_chi_kan_result_array
             )
             dataset.set_feature(feature)

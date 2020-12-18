@@ -1,11 +1,12 @@
 import numpy as np
 
-from mjaigymml.features.custom.feature_reach_dahai import FeatureReachDahai
+from mjaigymml.features.custom.feature_reach_dahai_oracle \
+    import FeatureReachDahaiOracle
 from mjaigym.board import BoardState
 from mjaigym.board.function.rs_shanten_analysis import RsShantenAnalysis
 
 
-class ShantenV0(FeatureReachDahai):
+class ShantenV0(FeatureReachDahaiOracle):
 
     def __init__(self):
         self.shanten_analysis = RsShantenAnalysis()

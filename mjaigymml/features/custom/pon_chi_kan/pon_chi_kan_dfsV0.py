@@ -42,6 +42,7 @@ class PonChiKanDfsV0(FeaturePonChiKan):
         self.dfs = Dfs()
         self.shanten_analysis = RsShantenAnalysis()
 
+    @classmethod
     def get_length(cls) -> int:
         yaku_ch = len(YAKU_CHANNEL_MAP) * cls.DEPTH
         point_ch = len(cls.target_points) * cls.DEPTH

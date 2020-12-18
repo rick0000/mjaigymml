@@ -270,12 +270,18 @@ class ReachModel(BinaryModel):
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
 
+        oracle_zeros = np.zeros_like(
+            dataset.feature.reach_dahai_oracle_feature[actor])
         concated = np.concatenate([
             dataset.feature.common_feature,
             dataset.feature.reach_dahai_feature[actor],
             dataset.feature.reach_dahai_feature[shimocha],
             dataset.feature.reach_dahai_feature[toimen],
             dataset.feature.reach_dahai_feature[kamicha],
+            dataset.feature.reach_dahai_oracle_feature[actor],
+            oracle_zeros,  # shimocha
+            oracle_zeros,  # toimen
+            oracle_zeros,  # kamicha
         ], axis=0)
         return concated[:, :, np.newaxis]
 
@@ -298,12 +304,18 @@ class PonModel(BinaryModel):
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
 
+        oracle_zeros = np.zeros_like(
+            dataset.feature.reach_dahai_oracle_feature[actor])
         concated = np.concatenate([
             dataset.feature.common_feature,
             dataset.feature.reach_dahai_feature[actor],
             dataset.feature.reach_dahai_feature[shimocha],
             dataset.feature.reach_dahai_feature[toimen],
             dataset.feature.reach_dahai_feature[kamicha],
+            dataset.feature.reach_dahai_oracle_feature[actor],
+            oracle_zeros,  # shimocha
+            oracle_zeros,  # toimen
+            oracle_zeros,  # kamicha
         ], axis=0)
         return concated[:, :, np.newaxis]
 
@@ -325,12 +337,18 @@ class ChiModel(BinaryModel):
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
 
+        oracle_zeros = np.zeros_like(
+            dataset.feature.reach_dahai_oracle_feature[actor])
         concated = np.concatenate([
             dataset.feature.common_feature,
             dataset.feature.reach_dahai_feature[actor],
             dataset.feature.reach_dahai_feature[shimocha],
             dataset.feature.reach_dahai_feature[toimen],
             dataset.feature.reach_dahai_feature[kamicha],
+            dataset.feature.reach_dahai_oracle_feature[actor],
+            oracle_zeros,  # shimocha
+            oracle_zeros,  # toimen
+            oracle_zeros,  # kamicha
         ], axis=0)
         return concated[:, :, np.newaxis]
 
@@ -352,12 +370,18 @@ class KanModel(BinaryModel):
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
 
+        oracle_zeros = np.zeros_like(
+            dataset.feature.reach_dahai_oracle_feature[actor])
         concated = np.concatenate([
             dataset.feature.common_feature,
             dataset.feature.reach_dahai_feature[actor],
             dataset.feature.reach_dahai_feature[shimocha],
             dataset.feature.reach_dahai_feature[toimen],
             dataset.feature.reach_dahai_feature[kamicha],
+            dataset.feature.reach_dahai_oracle_feature[actor],
+            oracle_zeros,  # shimocha
+            oracle_zeros,  # toimen
+            oracle_zeros,  # kamicha
         ], axis=0)
         return concated[:, :, np.newaxis]
 
@@ -568,12 +592,18 @@ class DahaiModel(Model):
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
 
+        oracle_zeros = np.zeros_like(
+            dataset.feature.reach_dahai_oracle_feature[actor])
         concated = np.concatenate([
             dataset.feature.common_feature,
             dataset.feature.reach_dahai_feature[actor],
             dataset.feature.reach_dahai_feature[shimocha],
             dataset.feature.reach_dahai_feature[toimen],
             dataset.feature.reach_dahai_feature[kamicha],
+            dataset.feature.reach_dahai_oracle_feature[actor],
+            oracle_zeros,  # shimocha
+            oracle_zeros,  # toimen
+            oracle_zeros,  # kamicha
         ], axis=0)
         return concated[:, :, np.newaxis]
 
