@@ -27,7 +27,7 @@ class Trainer():
             load_model_file,
     ):
         if train_config.model_type == "dahai":
-            self._train_dahai(
+            self._train(
                 model,
                 dataset_queue,
                 feature_generate_process,
@@ -37,7 +37,7 @@ class Trainer():
                 load_model_file,
             )
         elif train_config.model_type == "reach":
-            self._train_dahai(
+            self._train(
                 model,
                 dataset_queue,
                 feature_generate_process,
@@ -49,7 +49,7 @@ class Trainer():
         else:
             raise NotImplementedError()
 
-    def _train_dahai(
+    def _train(
             self,
             model: Model,
             dataset_queue,

@@ -76,6 +76,7 @@ def run_extract_process(
                     for _ in pool.imap_unordered(_run_onegame_analyze,
                                                  one_chunk):
                         t.update(1)
+                    pool.close()
                 one_chunk.clear()
 
 
@@ -106,7 +107,7 @@ def run(
     dataset_queue = m.Queue(
         maxsize=multiprocessing.cpu_count()*2)
 
-    # トレーニングデータセット抽出プロセス起動
+    # トレーニングデータセット抽出プロセス
     p = threading.Thread(
         target=run_extract_process,
         args=(train_mjson_storage,
@@ -115,7 +116,6 @@ def run(
               train_config),
         daemon=True
     )
-    p.start()
 
     # 特徴量消費側定義
     # モデル定義
@@ -131,12 +131,15 @@ def run(
     from mjaigymml.trainer import Trainer
     trainer = Trainer()
 
-    mlflow.start_run(run_name=train_config.model_type)
+    mlflow.set_experiment(train_config.model_type)
+    mlflow.start_run()
     mlflow.log_param("train_mjson_dir", train_mjson_dir)
     mlflow.log_param("test_mjson_dir", test_mjson_dir)
     mlflow.log_params(model_config.get_dict())
     mlflow.log_params(train_config.get_dict())
     mlflow.log_param("extract_config", extract_config.get_json())
+
+    p.start()
 
     # 学習の実行
     trainer.train_loop(
