@@ -9,3 +9,4 @@ mlflow
 pyyaml
 git+https://github.com/rick0000/mjaigym.git@0.2.0
 h5py
+scikit-learn

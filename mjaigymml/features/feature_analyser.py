@@ -103,7 +103,7 @@ class FeatureAnalyser():
 
         board_state = board.get_state()
         dahai, reach, pon, chi, kan = self._possible_action_types(
-                board_state, None)
+            board_state, None)
 
         start_kyoku_line = mjson_list[0]
         assert start_kyoku_line["type"] == "start_kyoku"
@@ -139,7 +139,7 @@ class FeatureAnalyser():
             end_score_2=25000,
             end_score_3=25000,
 
-            next_action_type=None, 
+            next_action_type=None,
             next_action=None,
             candidate_action_type=None,  # 打牌では利用しないカラム
             next_and_candidate_is_same=None,  # 打牌では利用しないカラム
@@ -385,7 +385,7 @@ class FeatureAnalyser():
             if state.previous_action["type"] == "dahai" and \
                     (not state.reach[next_action["actor"]]):
                 dahai = True
-                
+
         # other check
         for player_actions in state.possible_actions.values():
             for action in player_actions:

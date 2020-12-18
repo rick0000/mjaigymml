@@ -4,6 +4,8 @@ import random
 from collections import deque
 from pathlib import Path
 
+import mlflow
+
 import loggers as lgs
 from mjaigymml.models.model import Model
 
@@ -34,7 +36,7 @@ class Trainer():
                 model_save_dir,
                 load_model_file,
             )
-        elif train_config.model_type == "pon":
+        elif train_config.model_type == "reach":
             self._train_dahai(
                 model,
                 dataset_queue,
@@ -44,6 +46,8 @@ class Trainer():
                 model_save_dir,
                 load_model_file,
             )
+        else:
+            raise NotImplementedError()
 
     def _train_dahai(
             self,
@@ -100,10 +104,12 @@ class Trainer():
                 lgs.logger_main.info(f"game count:{game_count}")
                 pprint.pprint(update_result)
 
+                mlflow.log_metrics(update_result, step=game_count)
+
                 update_count += 1
                 if update_count % 20 == 0:
                     lgs.logger_main.info("save model")
-                    output_path = Path(model_save_dir / model_type / f"{game_count}.pth")
+                    output_path = Path(model_save_dir) / \
+                        train_config.model_type / f"{game_count}.pth"
                     output_path.parent.mkdir(parents=True, exist_ok=True)
                     model.save(output_path)
-

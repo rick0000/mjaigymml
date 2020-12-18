@@ -6,10 +6,11 @@ from typing import List
 
 import torch
 import torch.nn as nn
+from sklearn.metrics import average_precision_score
 
 from mjaigym.board.function.pai import Pai
 from mjaigymml.features.feature_analysis import Dataset, FeatureRecord
-from mjaigymml.models.net import Head2Net, ActorCriticNet
+from mjaigymml.models.net import BinaryNet, ActorCriticNet
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -34,6 +35,7 @@ class Model(metaclass=ABCMeta):
         self.criterion = self.get_criterion()
         self.softmax = nn.Softmax(dim=1)
         self.batch_size = batch_size
+        self.sigmoid = nn.Sigmoid()
 
     def load(self, path):
         state = torch.load(path, map_location=torch.device(DEVICE))
@@ -78,7 +80,7 @@ class Model(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
-class Head2Model(Model):
+class BinaryModel(Model):
     """立直、チー、ポン、カン用モデル
     """
 
@@ -101,12 +103,17 @@ class Head2Model(Model):
             in_channels: int,
             mid_channels: int,
             blocks_num: int):
-        return Head2Net(in_channels, mid_channels, blocks_num)
+        return BinaryNet(in_channels, mid_channels, blocks_num)
 
     def get_criterion(self):
-        return nn.CrossEntropyLoss()
+        raise NotImplementedError()
 
-    def policy(self, states):
+    def policy(self, datasets: List[Dataset]):
+        """
+        softmaxを適用した行動確率を返す。
+        """
+        states = np.array([self._calc_feature(d) for d in datasets])
+
         self.model.eval()
         with torch.no_grad():
             inputs = torch.Tensor(states).float().to(DEVICE)
@@ -114,71 +121,248 @@ class Head2Model(Model):
             prob = self.softmax(policy)
         return prob.cpu().detach().numpy()
 
-    def estimate(self, states):
-        raise NotImplementedError()
-
-    def evaluate(self, experiences):
-        batch_num = len(experiences) // self.batch_size
+    def update(self, datasets: List[Dataset]):
+        """
+        ニューラルネットの重みを更新する
+        """
+        batch_num = len(datasets) // self.batch_size
         if batch_num == 0:
-            return 0, 0
+            return {}
 
         total_loss = 0.0
         correct = 0
         total = 0
+
+        states = np.array([self._calc_feature(d) for d in datasets])
+        actions = np.array([self._calc_label(d) for d in datasets])
+
+        # lgs.logger_main.info(
+        #   f"start size:{sys.getsizeof(states)//(1024*1024)}MB")
+        all_inputs = torch.Tensor(states).float().to(DEVICE)
+        all_targets = torch.Tensor(actions).float().to(DEVICE)
+        # lgs.logger_main.info(
+        #   f"start train {len(experiences)}records to {batch_num} minibatchs")
+
+        result = {}
+        all_p_loss = 0
+        predicts = []
+        # all_v_mse = 0
         for i in range(batch_num):
-            target_experiences = \
-                experiences[i * self.batch_size:(i+1)*self.batch_size]
-            states = [e[0] for e in target_experiences]
-            actions = [e[1] for e in target_experiences]
-
-            self.model.eval()
-            with torch.no_grad():
-                inputs = torch.Tensor(states).float().to(DEVICE)
-                targets = torch.Tensor(actions).long().to(DEVICE)
-                outputs = self.model(inputs)
-                loss = self.criterion(outputs, targets)
-                _, predicted = torch.max(outputs.data, 1)
-                correct += predicted.eq(targets.data).cpu().sum().detach()
-                total += len(states)
-                total_loss += loss.cpu().detach()
-
-            del states, actions, target_experiences, inputs, targets
-        gc.collect()
-        acc = 100.0 * correct / (total + EPS)
-        return float(total_loss / batch_num), float(acc)
-
-    def update(self, experiences):
-        batch_num = len(experiences) // self.batch_size
-        if batch_num == 0:
-            return 0, 0
-
-        total_loss = 0.0
-        correct = 0
-        total = 0
-        for i in range(batch_num):
-            target_experiences = \
-                experiences[i * self.batch_size:(i+1)*self.batch_size]
-            states = [e[0] for e in target_experiences]
-            actions = [e[1] for e in target_experiences]
-
+            inputs = all_inputs[i*self.batch_size:(i+1)*self.batch_size]
+            targets = all_targets[i*self.batch_size:(i+1)*self.batch_size]
             self.model.train()
-            inputs = torch.Tensor(states).float().to(DEVICE)
-            targets = torch.Tensor(actions).long().to(DEVICE)
             outputs = self.model(inputs)
-            loss = self.criterion(outputs, targets)
+            policy_loss = self.criterion(outputs, targets)
+            loss = policy_loss
+
+            all_p_loss += policy_loss.detach()
+
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
-            _, predicted = torch.max(outputs.data, 1)
-            correct += predicted.eq(targets.data).cpu().sum().detach()
-            total += len(states)
-            total_loss += loss.cpu().detach()
 
-            del states, actions, target_experiences, inputs, targets
+            activated_outputs = self.sigmoid(outputs.data.detach())
+            rounded_output = torch.round(activated_outputs)
+            correct += rounded_output.eq(targets.data).detach().cpu().sum()
+
+            total += len(inputs)
+            total_loss += loss.cpu().detach()
+            predicts.append(activated_outputs.cpu().detach().numpy())
+
+        concated_predicts = np.concatenate(predicts, axis=0)
+        rounded_concated_predicts = np.round(concated_predicts)
         gc.collect()
 
         acc = 100.0 * correct / (total + EPS)
-        return float(total_loss / batch_num), float(acc)
+        result["train/acc"] = float(acc)
+        result["train/loss"] = float(total_loss / batch_num)
+
+        # calc pr-auc
+        # pr-auc is robust for imbalanced data
+        average_precision = average_precision_score(
+            actions, concated_predicts)
+
+        result["train/average_precision"] = average_precision
+
+        result["train/1"] = (actions == 1).sum()
+        result["train/0"] = (actions == 0).sum()
+        result["train/t1_p1"] = ((actions == 1) &
+                                 (actions == rounded_concated_predicts)).sum()
+        result["train/t0_p0"] = ((actions == 0) &
+                                 (actions == rounded_concated_predicts)).sum()
+        result["train/t1_p0"] = ((actions == 1) &
+                                 (actions != rounded_concated_predicts)).sum()
+        result["train/t0_p1"] = ((actions == 0) &
+                                 (actions != rounded_concated_predicts)).sum()
+
+        return result
+
+    def evaluate(self, datasets: List[Dataset]):
+        batch_num = len(datasets) // self.batch_size
+        if batch_num == 0:
+            return {}
+
+        total_loss = 0.0
+        correct = 0
+        total = 0
+
+        states = np.array([self._calc_feature(d) for d in datasets])
+        actions = np.array([self._calc_label(d) for d in datasets])
+
+        # lgs.logger_main.info(
+        #   f"start size:{sys.getsizeof(states)//(1024*1024)}MB")
+        all_inputs = torch.Tensor(states).float().to(DEVICE)
+        all_targets = torch.Tensor(actions).float().to(DEVICE)
+        # lgs.logger_main.info(
+        #   f"start train {len(experiences)}records to {batch_num} minibatchs")
+
+        result = {}
+        all_p_loss = 0
+
+        # all_v_mse = 0
+        for i in range(batch_num):
+            inputs = all_inputs[i*self.batch_size:(i+1)*self.batch_size]
+            targets = all_targets[i*self.batch_size:(i+1)*self.batch_size]
+            self.model.eval()
+            outputs = self.model(inputs)
+            loss = self.criterion(outputs, targets)
+
+            all_p_loss += loss.detach()
+
+            _, predicted = torch.max(outputs.data, 1)
+            correct += predicted.eq(targets.data).cpu().sum().detach()
+            total += len(inputs)
+            total_loss += loss.cpu().detach()
+
+        gc.collect()
+
+        acc = 100.0 * correct / (total + EPS)
+        result["test/dahai_acc"] = float(acc)
+        result["test/loss"] = float(total_loss / batch_num)
+        result["test/dahai_loss"] = all_p_loss / batch_num
+
+        return result
+
+    def _calc_feature(self, dataset: Dataset):
+        raise NotImplementedError()
+
+    def _calc_label(self, dataset: Dataset):
+        raise NotImplementedError()
+
+
+class ReachModel(BinaryModel):
+    POS_NEG_RATE = torch.Tensor([2.0]).float().to(DEVICE)
+
+    def get_criterion(self):
+        # for imbalanced data
+        return nn.BCEWithLogitsLoss(pos_weight=ReachModel.POS_NEG_RATE)
+
+    def _calc_feature(self, dataset: Dataset):
+        if dataset.label.next_action_type is not None:
+            actor = dataset.label.next_action['actor']
+        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
+            actor = dataset.board_state.previous_action['actor']
+        else:
+            import pdb
+            pdb.set_trace()
+            raise Exception("not implemented")
+        shimocha = (actor + 1) % 4
+        toimen = (actor + 2) % 4
+        kamicha = (actor + 3) % 4
+
+        concated = np.concatenate([
+            dataset.feature.common_feature,
+            dataset.feature.reach_dahai_feature[actor],
+            dataset.feature.reach_dahai_feature[shimocha],
+            dataset.feature.reach_dahai_feature[toimen],
+            dataset.feature.reach_dahai_feature[kamicha],
+        ], axis=0)
+        return concated[:, :, np.newaxis]
+
+    def _calc_label(self, dataset: Dataset):
+        do_reach = dataset.label.next_action['type'] == "reach"
+        return do_reach
+
+
+class PonModel(BinaryModel):
+    def _calc_feature(self, dataset: Dataset):
+        if dataset.label.next_action_type is not None:
+            actor = dataset.label.next_action['actor']
+        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
+            actor = dataset.board_state.previous_action['actor']
+        else:
+            import pdb
+            pdb.set_trace()
+            raise Exception("not implemented")
+        shimocha = (actor + 1) % 4
+        toimen = (actor + 2) % 4
+        kamicha = (actor + 3) % 4
+
+        concated = np.concatenate([
+            dataset.feature.common_feature,
+            dataset.feature.reach_dahai_feature[actor],
+            dataset.feature.reach_dahai_feature[shimocha],
+            dataset.feature.reach_dahai_feature[toimen],
+            dataset.feature.reach_dahai_feature[kamicha],
+        ], axis=0)
+        return concated[:, :, np.newaxis]
+
+    def _calc_label(self, dataset: Dataset):
+        NotImplementedError()
+
+
+class ChiModel(BinaryModel):
+    def _calc_feature(self, dataset: Dataset):
+        if dataset.label.next_action_type is not None:
+            actor = dataset.label.next_action['actor']
+        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
+            actor = dataset.board_state.previous_action['actor']
+        else:
+            import pdb
+            pdb.set_trace()
+            raise Exception("not implemented")
+        shimocha = (actor + 1) % 4
+        toimen = (actor + 2) % 4
+        kamicha = (actor + 3) % 4
+
+        concated = np.concatenate([
+            dataset.feature.common_feature,
+            dataset.feature.reach_dahai_feature[actor],
+            dataset.feature.reach_dahai_feature[shimocha],
+            dataset.feature.reach_dahai_feature[toimen],
+            dataset.feature.reach_dahai_feature[kamicha],
+        ], axis=0)
+        return concated[:, :, np.newaxis]
+
+    def _calc_label(self, dataset: Dataset):
+        NotImplementedError()
+
+
+class KanModel(BinaryModel):
+    def _calc_feature(self, dataset: Dataset):
+        if dataset.label.next_action_type is not None:
+            actor = dataset.label.next_action['actor']
+        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
+            actor = dataset.board_state.previous_action['actor']
+        else:
+            import pdb
+            pdb.set_trace()
+            raise Exception("not implemented")
+        shimocha = (actor + 1) % 4
+        toimen = (actor + 2) % 4
+        kamicha = (actor + 3) % 4
+
+        concated = np.concatenate([
+            dataset.feature.common_feature,
+            dataset.feature.reach_dahai_feature[actor],
+            dataset.feature.reach_dahai_feature[shimocha],
+            dataset.feature.reach_dahai_feature[toimen],
+            dataset.feature.reach_dahai_feature[kamicha],
+        ], axis=0)
+        return concated[:, :, np.newaxis]
+
+    def _calc_label(self, dataset: Dataset):
+        NotImplementedError()
 
 
 class DahaiModel(Model):
@@ -313,7 +497,6 @@ class DahaiModel(Model):
         return result
 
     def evaluate(self, datasets: List[Dataset]):
-
         batch_num = len(datasets) // self.batch_size
         if batch_num == 0:
             return {}
@@ -401,7 +584,7 @@ class DahaiModel(Model):
         """
         NOTE:1000点を1としている。
 
-        NOTE:以下を使えば割引報酬にすることも可能
+        NOTE:以下を使えば割引報酬にすることが可能
 
         dataset.label.kyoku_line_index
             局の何行目まで適用済みの状態か 0-index。

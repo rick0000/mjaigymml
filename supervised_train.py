@@ -3,6 +3,7 @@ import threading
 import multiprocessing
 
 from tqdm import tqdm
+import mlflow
 
 from mjaigymml.features.feature_analyser_factory import FeatureAnalyzerFactory
 from mjaigymml.features.feature_analyser import FeatureAnalyser
@@ -96,7 +97,7 @@ def run(
 
     # 牌譜解析の設定
     analyser = FeatureAnalyzerFactory.get_analyzer(
-        train_config.model_type, 
+        train_config.model_type,
         extract_config)
 
     # トレーニングデータセット連携用キュー
@@ -129,6 +130,14 @@ def run(
     # 学習の定義
     from mjaigymml.trainer import Trainer
     trainer = Trainer()
+
+    mlflow.start_run(run_name=train_config.model_type)
+    mlflow.log_param("train_mjson_dir", train_mjson_dir)
+    mlflow.log_param("test_mjson_dir", test_mjson_dir)
+    mlflow.log_params(model_config.get_dict())
+    mlflow.log_params(train_config.get_dict())
+    mlflow.log_param("extract_config", extract_config.get_json())
+
     # 学習の実行
     trainer.train_loop(
         model,

@@ -30,7 +30,7 @@ class FeatureAnalyzerFactory():
 
     @classmethod
     def _get_reach_analyzer(cls, extract_config):
-        pass
+        return FeatureAnalyser(extract_config)
 
     @classmethod
     def _get_pon_analyzer(cls, extract_config):

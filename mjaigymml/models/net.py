@@ -52,6 +52,41 @@ class Head34Net(nn.Module):
         return x
 
 
+class BinaryNet(nn.Module):
+    def __init__(self, in_channels: int, mid_channels: int, blocks_num: int):
+        super(BinaryNet, self).__init__()
+        self.preproc = nn.Sequential(
+            nn.Conv2d(in_channels=in_channels, out_channels=mid_channels,
+                      kernel_size=(3, 1), padding=(1, 0), bias=False),
+            nn.BatchNorm2d(mid_channels),
+            nn.ReLU()
+        )
+
+        blocks = []
+        for _i in range(blocks_num):
+            blocks.append(ResBlock(mid_channels))
+
+        self.res_blocks = nn.Sequential(*blocks)
+        self.postproc = nn.Sequential(
+            nn.Conv2d(in_channels=mid_channels, out_channels=32,
+                      kernel_size=(3, 1), padding=(1, 0), bias=False),
+        )
+        self.fc1 = nn.Linear(34*32, 1024)
+        self.fc2 = nn.Linear(1024, 256)
+        self.out = nn.Linear(256, 1)
+
+    def forward(self, x):
+        x = self.preproc(x)
+        x = self.res_blocks(x)
+        x = self.postproc(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc1(x)
+        x = self.fc2(x)
+        x = self.out(x)
+        x = x.view(x.size(0))
+        return x
+
+
 class Head2Net(nn.Module):
     def __init__(self, in_channels: int, mid_channels: int, blocks_num: int):
         super(Head2Net, self).__init__()

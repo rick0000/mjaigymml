@@ -1,4 +1,4 @@
-from mjaigymml.models.model import DahaiModel, Head2Model
+from mjaigymml.models.model import DahaiModel, ReachModel, ChiModel, PonModel, KanModel
 from mjaigymml.config.model_config import ModelConfig
 
 
@@ -52,7 +52,7 @@ class ModelFactory:
 
     @classmethod
     def _get_reach_model(cls, model_config, feature_length):
-        return Head2Model(
+        return ReachModel(
             feature_length,
             model_config.mid_channels,
             model_config.resnet_repeat,
@@ -62,7 +62,7 @@ class ModelFactory:
 
     @classmethod
     def _get_pon_model(cls, model_config, feature_length):
-        return Head2Model(
+        return PonModel(
             feature_length,
             model_config.mid_channels,
             model_config.resnet_repeat,
@@ -72,7 +72,7 @@ class ModelFactory:
 
     @classmethod
     def _get_kan_model(cls, model_config, feature_length):
-        return Head2Model(
+        return KanModel(
             feature_length,
             model_config.mid_channels,
             model_config.resnet_repeat,
@@ -82,7 +82,7 @@ class ModelFactory:
 
     @classmethod
     def _get_chi_model(cls, model_config, feature_length):
-        return Head2Model(
+        return ChiModel(
             feature_length,
             model_config.mid_channels,
             model_config.resnet_repeat,
