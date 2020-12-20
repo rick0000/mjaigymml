@@ -2,6 +2,7 @@ from typing import Dict, List
 import importlib
 import random
 from pathlib import Path
+import copy
 
 import numpy as np
 
@@ -90,10 +91,8 @@ class FeatureAnalyser():
             + self.reach_dahai_oracle_length * 4
 
     def get_pon_chi_kan_feature_length(self):
-        return self.common_length\
-            + self.reach_dahai_length * 4\
-            + self.reach_dahai_oracle_length * 4\
-            + self.pon_chi_kan_length * 4
+        return self.get_reach_dahai_feature_length()\
+            + self.pon_chi_kan_length
 
     def reset_extractor_state(self):
         """
@@ -160,18 +159,20 @@ class FeatureAnalyser():
             next_action_type=None,
             next_action=None,
             candidate_action_type=None,  # 打牌では利用しないカラム
-            next_and_candidate_is_same=None,  # 打牌では利用しないカラム
+
             candidate_action=None,  # 打牌では利用しないカラム
         )
 
         if pon or chi or kan:
-            # TODO:LabelRecordに追加
-            # candidate_action_type=None,  # 打牌では利用しないカラム
-            # next_and_candidate_is_same=None,  # 打牌では利用しないカラム
-            # candidate_action=None,  # 打牌では利用しないカラム
             for player_id in range(4):
                 for possible_action in board_state.possible_actions[player_id]:
                     if possible_action['type'] in ["pon", "chi", "ankan", "kakan", "daiminkan"]:
+                        candidate_l = copy.deepcopy(label_record)
+                        candidate_l.set_candidate_action(
+                            possible_action)
+                        candidate_l.set_candidate_action_type(
+                            possible_action["type"])
+
                         # 1副露アクション候補に対して1レコード発生
                         dataset = Dataset(
                             label_record, board_state, possible_action)
@@ -260,7 +261,7 @@ class FeatureAnalyser():
                     next_action_type=next_action["type"],
                     next_action=next_action,
                     candidate_action_type=None,  # 打牌では利用しないカラム
-                    next_and_candidate_is_same=None,  # 打牌では利用しないカラム
+
                     candidate_action=None,  # 打牌では利用しないカラム
                 )
 
@@ -268,9 +269,16 @@ class FeatureAnalyser():
                     for player_id in range(4):
                         for possible_action in board_state.possible_actions[player_id]:
                             if possible_action['type'] in ["pon", "chi", "ankan", "kakan", "daiminkan"]:
+                                candidate_l = copy.deepcopy(
+                                    label_record)
+                                candidate_l.set_candidate_action(
+                                    possible_action)
+                                candidate_l.set_candidate_action_type(
+                                    possible_action["type"])
+
                                 # 1副露アクション候補に対して1レコード発生
                                 dataset = Dataset(
-                                    label_record, board_state, possible_action)
+                                    candidate_l, board_state, possible_action)
                                 datasets.append(dataset)
                 else:
                     # 1行に対して1レコード発生
@@ -373,6 +381,8 @@ class FeatureAnalyser():
             pon_chi_kan_result_array = None
             # calc pon_chi_kan_feaature
             if dataset.label.pon or dataset.label.chi or dataset.label.kan:
+                assert dataset.candidate_action["type"] in [
+                    "pon", "chi", "ankan", "kakan", "daiminkan"]
                 # 出現する場合のみメモリ確保
                 pon_chi_kan_result_array = np.zeros(
                     (self.pon_chi_kan_length, 34))
@@ -381,12 +391,11 @@ class FeatureAnalyser():
                     target_array = pon_chi_kan_result_array[
                         pon_chi_kan_index:pon_chi_kan_index + e.get_length(),
                         :]
-
                     e.calc(
                         result=target_array,
                         board_state=dataset.board_state,
-                        player_id=dataset.candidate_furo_action['actor'],
-                        candidate_furo_action=dataset.candidate_furo_action
+                        player_id=dataset.candidate_action['actor'],
+                        candidate_furo_action=dataset.candidate_action
                     )
                     pon_chi_kan_index += e.get_length()
 

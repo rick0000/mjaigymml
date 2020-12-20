@@ -291,21 +291,22 @@ class ReachModel(BinaryModel):
 
 
 class PonModel(BinaryModel):
+    POS_NEG_RATE = torch.Tensor([4.0]).float().to(DEVICE)
+
+    def get_criterion(self):
+        # for imbalanced data
+        return nn.BCEWithLogitsLoss(pos_weight=PonModel.POS_NEG_RATE)
+
     def _calc_feature(self, dataset: Dataset):
-        if dataset.label.next_action_type is not None:
-            actor = dataset.label.next_action['actor']
-        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
-            actor = dataset.board_state.previous_action['actor']
-        else:
-            import pdb
-            pdb.set_trace()
-            raise Exception("not implemented")
+
+        actor = dataset.candidate_action['actor']
         shimocha = (actor + 1) % 4
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
 
         oracle_zeros = np.zeros_like(
             dataset.feature.reach_dahai_oracle_feature[actor])
+
         concated = np.concatenate([
             dataset.feature.common_feature,
             dataset.feature.reach_dahai_feature[actor],
@@ -316,11 +317,13 @@ class PonModel(BinaryModel):
             oracle_zeros,  # shimocha
             oracle_zeros,  # toimen
             oracle_zeros,  # kamicha
+            dataset.feature.pon_chi_kan_feature,
         ], axis=0)
         return concated[:, :, np.newaxis]
 
     def _calc_label(self, dataset: Dataset):
-        NotImplementedError()
+        do_pon = dataset.label.next_action == dataset.label.candidate_action
+        return do_pon
 
 
 class ChiModel(BinaryModel):

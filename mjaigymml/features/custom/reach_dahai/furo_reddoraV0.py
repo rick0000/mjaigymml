@@ -21,6 +21,6 @@ class FuroReddoraV0(FeatureReachDahai):
             result: np.array,
             board_state: BoardState,
             player_id: int,
-            candidate_furo: Dict):
+    ):
         num = board_state.furo_open_red_dora_nums[player_id]
         result[0:num, :] = 1

@@ -6,7 +6,8 @@ import numpy as np
 from mjaigym.board.board_state import BoardState
 
 
-class LabelRecord(NamedTuple):
+@dataclass
+class LabelRecord():
     filename: str  # mjsonファイル名
     mjson_line_index: int  # 牌譜の何行目まで適用済みの状態か 0-index。
     kyoku_line_index: int  # 局の何行目まで適用済みの状態か 0-index。
@@ -18,7 +19,6 @@ class LabelRecord(NamedTuple):
     kyotaku: int  # 供託
 
     candidate_action_type: str  # 副露行動候補のタイプ
-    next_and_candidate_is_same: bool  # 副露行動候補が次のアクションで採用されたか
     next_action_type: str  # その後取られたアクションのタイプ
 
     dahai: bool  # 打牌選択局面の場合1、それ以外0
@@ -42,6 +42,12 @@ class LabelRecord(NamedTuple):
 
     candidate_action: Dict  # 副露候補
     next_action: Dict  # その後取られたアクション
+
+    def set_candidate_action(self, candidate_action):
+        self.candidate_action = candidate_action
+
+    def set_candidate_action_type(self, candidate_action_type):
+        self.candidate_action_type = candidate_action_type
 
 
 @dataclass

@@ -26,17 +26,7 @@ class Trainer():
             model_save_dir,
             load_model_file,
     ):
-        if train_config.model_type == "dahai":
-            self._train(
-                model,
-                dataset_queue,
-                feature_generate_process,
-                train_config,
-                model_config,
-                model_save_dir,
-                load_model_file,
-            )
-        elif train_config.model_type == "reach":
+        if train_config.model_type in ["dahai", "reach", "pon", "chi", "kan"]:
             self._train(
                 model,
                 dataset_queue,

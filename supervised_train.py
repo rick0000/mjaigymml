@@ -55,8 +55,8 @@ def run_extract_process(
 
     lgs.info("start extract process")
 
-    cpu_num = multiprocessing.cpu_count()
-    # cpu_num = 1  # for debug
+    # cpu_num = multiprocessing.cpu_count()
+    cpu_num = 1  # for debug
 
     if cpu_num == 1:
         for mjson in train_mjson_storage.get_mjsons():

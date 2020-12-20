@@ -34,12 +34,12 @@ class FeatureAnalyzerFactory():
 
     @classmethod
     def _get_pon_analyzer(cls, extract_config):
-        pass
+        return FeatureAnalyser(extract_config)
 
     @classmethod
     def _get_kan_analyzer(cls, extract_config):
-        pass
+        return FeatureAnalyser(extract_config)
 
     @classmethod
     def _get_chi_analyzer(cls, extract_config):
-        pass
+        return FeatureAnalyser(extract_config)
