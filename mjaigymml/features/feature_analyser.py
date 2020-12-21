@@ -305,11 +305,14 @@ class FeatureAnalyser():
         elif train_config.model_type == "reach":
             records = [d for d in datasets if d.label.reach]
         elif train_config.model_type == "pon":
-            records = [d for d in datasets if d.label.pon]
+            records = [
+                d for d in datasets if d.label.candidate_action_type == "pon"]
         elif train_config.model_type == "chi":
-            records = [d for d in datasets if d.label.chi]
+            records = [
+                d for d in datasets if d.label.candidate_action_type == "chi"]
         elif train_config.model_type == "kan":
-            records = [d for d in datasets if d.label.kan]
+            records = [d for d in datasets
+                       if d.label.candidate_action_type in ["ankan", "kakan", "daiminkan"]]
         else:
             raise Exception("not intended path.")
 

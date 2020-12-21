@@ -323,19 +323,24 @@ class PonModel(BinaryModel):
 
     def _calc_label(self, dataset: Dataset):
         do_pon = dataset.label.next_action == dataset.label.candidate_action
+        assert dataset.label.candidate_action["type"] == "pon"
         return do_pon
 
 
 class ChiModel(BinaryModel):
+    POS_NEG_RATE = torch.Tensor([10.0]).float().to(DEVICE)
+
+    def get_criterion(self):
+        # for imbalanced data
+        return nn.BCEWithLogitsLoss(pos_weight=ChiModel.POS_NEG_RATE)
+
     def _calc_feature(self, dataset: Dataset):
-        if dataset.label.next_action_type is not None:
-            actor = dataset.label.next_action['actor']
-        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
-            actor = dataset.board_state.previous_action['actor']
-        else:
-            import pdb
-            pdb.set_trace()
-            raise Exception("not implemented")
+
+        actor = dataset.candidate_action['actor']
+        shimocha = (actor + 1) % 4
+        toimen = (actor + 2) % 4
+        kamicha = (actor + 3) % 4
+
         shimocha = (actor + 1) % 4
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
@@ -352,11 +357,18 @@ class ChiModel(BinaryModel):
             oracle_zeros,  # shimocha
             oracle_zeros,  # toimen
             oracle_zeros,  # kamicha
+            dataset.feature.pon_chi_kan_feature,
         ], axis=0)
         return concated[:, :, np.newaxis]
 
     def _calc_label(self, dataset: Dataset):
-        NotImplementedError()
+        do_chi = dataset.label.next_action == dataset.label.candidate_action
+        try:
+            assert dataset.label.candidate_action["type"] == "chi"
+        except:
+            import pdb
+            pdb.set_trace()
+        return do_chi
 
 
 class KanModel(BinaryModel):
