@@ -414,7 +414,9 @@ class DahaiModel(Model):
             mid_channels: int,
             blocks_num: int,
             learning_rate: float,
-            batch_size: int):
+            batch_size: int,
+            oracle_rate: float=0.0,
+            ):
         super().__init__(
             in_channels,
             mid_channels,
@@ -424,6 +426,8 @@ class DahaiModel(Model):
 
         self.celoss = nn.CrossEntropyLoss()
         self.mseloss = nn.MSELoss()
+        self.oracle_rate = oracle_rate
+        self.no_oracle = oracle_rate == 0.0
 
     def build_model(
             self,
@@ -526,11 +530,11 @@ class DahaiModel(Model):
         result["train/dahai_acc"] = float(acc)
 
         result["train/loss"] = float(total_loss / batch_num)
-        result["train/dahai_loss"] = all_p_loss / batch_num
-        result["train/value_loss"] = all_v_loss / batch_num
+        result["train/dahai_loss"] = float(all_p_loss / batch_num)
+        result["train/value_loss"] = float(all_v_loss / batch_num)
         result["train/reward.var"] = np.var(rewards)
         var_minus_loss = (float(np.var(rewards)) - result["train/value_loss"])
-        result["train/(reward.var - value_loss)÷reward.var"] = \
+        result["train/ reward.var - value_loss div reward.var"] = \
             var_minus_loss / result["train/reward.var"]
 
         return result
@@ -585,10 +589,10 @@ class DahaiModel(Model):
         result["test/dahai_acc"] = float(acc)
 
         result["test/loss"] = float(total_loss / batch_num)
-        result["test/dahai_loss"] = all_p_loss / batch_num
-        result["test/value_loss"] = all_v_loss / batch_num
+        result["test/dahai_loss"] = float(all_p_loss / batch_num)
+        result["test/value_loss"] = float(all_v_loss / batch_num)
         result["test/reward.var"] = np.var(rewards)
-        result["test/(reward.var - value_loss)÷reward.var"] = \
+        result["test/reward.var - value_loss div reward.var"] = \
             (float(np.var(rewards)) -
              result["test/value_loss"]) / result["test/reward.var"]
 
@@ -607,19 +611,36 @@ class DahaiModel(Model):
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
 
-        oracle_zeros = np.zeros_like(
-            dataset.feature.reach_dahai_oracle_feature[actor])
-        concated = np.concatenate([
-            dataset.feature.common_feature,
-            dataset.feature.reach_dahai_feature[actor],
-            dataset.feature.reach_dahai_feature[shimocha],
-            dataset.feature.reach_dahai_feature[toimen],
-            dataset.feature.reach_dahai_feature[kamicha],
-            dataset.feature.reach_dahai_oracle_feature[actor],
-            oracle_zeros,  # shimocha
-            oracle_zeros,  # toimen
-            oracle_zeros,  # kamicha
-        ], axis=0)
+        if self.no_oracle or self.oracle_rate <= np.random.rand():
+            oracle_zeros = np.zeros_like(
+                dataset.feature.reach_dahai_oracle_feature[actor])
+            concated = np.concatenate([
+                dataset.feature.common_feature,
+                dataset.feature.reach_dahai_feature[actor],
+                dataset.feature.reach_dahai_feature[shimocha],
+                dataset.feature.reach_dahai_feature[toimen],
+                dataset.feature.reach_dahai_feature[kamicha],
+                dataset.feature.reach_dahai_oracle_feature[actor],
+                oracle_zeros,  # shimocha
+                oracle_zeros,  # toimen
+                oracle_zeros,  # kamicha
+            ], axis=0)
+        else:
+            print("use oracle feature")
+            oracle_zeros = np.zeros_like(
+                dataset.feature.reach_dahai_oracle_feature[actor])
+            concated = np.concatenate([
+                dataset.feature.common_feature,
+                dataset.feature.reach_dahai_feature[actor],
+                dataset.feature.reach_dahai_feature[shimocha],
+                dataset.feature.reach_dahai_feature[toimen],
+                dataset.feature.reach_dahai_feature[kamicha],
+                dataset.feature.reach_dahai_oracle_feature[actor],
+                dataset.feature.reach_dahai_oracle_feature[shimocha],  # shimocha
+                dataset.feature.reach_dahai_oracle_feature[toimen],  # toimen
+                dataset.feature.reach_dahai_oracle_feature[kamicha],  # kamicha
+            ], axis=0)
+
         return concated[:, :, np.newaxis]
 
     def _calc_label(self, dataset: Dataset):

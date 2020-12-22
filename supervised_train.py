@@ -69,7 +69,7 @@ def run_extract_process(
                 one_chunk.append(
                     (mjson, analyser, dataset_queue, train_config))
 
-                if len(one_chunk) < 256:
+                if len(one_chunk) < 128:
                     continue
 
                 with multiprocessing.Pool(processes=cpu_num) as pool:
