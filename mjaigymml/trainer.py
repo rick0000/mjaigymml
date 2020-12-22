@@ -3,6 +3,7 @@ import pprint
 import random
 from collections import deque
 from pathlib import Path
+import gc
 
 import mlflow
 

@@ -372,6 +372,12 @@ class ChiModel(BinaryModel):
 
 
 class KanModel(BinaryModel):
+    POS_NEG_RATE = torch.Tensor([20.0]).float().to(DEVICE)
+
+    def get_criterion(self):
+        # for imbalanced data
+        return nn.BCEWithLogitsLoss(pos_weight=KanModel.POS_NEG_RATE)
+
     def _calc_feature(self, dataset: Dataset):
         if dataset.label.next_action_type is not None:
             actor = dataset.label.next_action['actor']
@@ -397,11 +403,19 @@ class KanModel(BinaryModel):
             oracle_zeros,  # shimocha
             oracle_zeros,  # toimen
             oracle_zeros,  # kamicha
+            dataset.feature.pon_chi_kan_feature,
         ], axis=0)
         return concated[:, :, np.newaxis]
 
     def _calc_label(self, dataset: Dataset):
-        NotImplementedError()
+        do_kan = dataset.label.next_action == dataset.label.candidate_action
+        try:
+            assert dataset.label.candidate_action["type"] in [
+                "ankan", "kakan", "daiminkan"]
+        except:
+            import pdb
+            pdb.set_trace()
+        return do_kan
 
 
 class DahaiModel(Model):
@@ -415,8 +429,8 @@ class DahaiModel(Model):
             blocks_num: int,
             learning_rate: float,
             batch_size: int,
-            oracle_rate: float=0.0,
-            ):
+            oracle_rate: float = 0.0,
+    ):
         super().__init__(
             in_channels,
             mid_channels,
@@ -636,7 +650,8 @@ class DahaiModel(Model):
                 dataset.feature.reach_dahai_feature[toimen],
                 dataset.feature.reach_dahai_feature[kamicha],
                 dataset.feature.reach_dahai_oracle_feature[actor],
-                dataset.feature.reach_dahai_oracle_feature[shimocha],  # shimocha
+                # shimocha
+                dataset.feature.reach_dahai_oracle_feature[shimocha],
                 dataset.feature.reach_dahai_oracle_feature[toimen],  # toimen
                 dataset.feature.reach_dahai_oracle_feature[kamicha],  # kamicha
             ], axis=0)

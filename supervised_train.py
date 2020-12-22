@@ -1,6 +1,7 @@
 import argparse
 import threading
 import multiprocessing
+import gc
 
 from tqdm import tqdm
 import mlflow
@@ -13,7 +14,7 @@ from mjaigymml.config.extract_config import ExtractConfig
 from mjaigymml.config.train_config import TrainConfig
 from mjaigymml.config.model_config import ModelConfig
 from loggers import logger_main as lgs
-
+# import objgraph
 
 TEST_DATASET = multiprocessing.Queue()
 
@@ -40,6 +41,9 @@ def _run_onegame_analyze(args):
 
         dataset_queue.put(datasets)
     except KeyboardInterrupt:
+        return
+    except Exception as e:
+        print(e)
         return
 
 
@@ -78,6 +82,8 @@ def run_extract_process(
                         t.update(1)
                     pool.close()
                 one_chunk.clear()
+
+                # objgraph.show_growth()
 
 
 def run(
