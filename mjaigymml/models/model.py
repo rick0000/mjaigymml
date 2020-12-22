@@ -546,10 +546,10 @@ class DahaiModel(Model):
         result["train/loss"] = float(total_loss / batch_num)
         result["train/dahai_loss"] = float(all_p_loss / batch_num)
         result["train/value_loss"] = float(all_v_loss / batch_num)
-        result["train/reward.var"] = np.var(rewards)
+        result["train/rewardvar"] = np.var(rewards)
         var_minus_loss = (float(np.var(rewards)) - result["train/value_loss"])
-        result["train/ reward.var - value_loss div reward.var"] = \
-            var_minus_loss / result["train/reward.var"]
+        result["train/RewardvarValuelossDiffRate"] = \
+            var_minus_loss / result["train/rewardvar"]
 
         return result
 
@@ -605,10 +605,10 @@ class DahaiModel(Model):
         result["test/loss"] = float(total_loss / batch_num)
         result["test/dahai_loss"] = float(all_p_loss / batch_num)
         result["test/value_loss"] = float(all_v_loss / batch_num)
-        result["test/reward.var"] = np.var(rewards)
-        result["test/reward.var - value_loss div reward.var"] = \
+        result["test/rewardvar"] = np.var(rewards)
+        result["test/RewardvarValuelossDiffRate"] = \
             (float(np.var(rewards)) -
-             result["test/value_loss"]) / result["test/reward.var"]
+             result["test/value_loss"]) / result["test/rewardvar"]
 
         return result
 
