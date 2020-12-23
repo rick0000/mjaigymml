@@ -20,6 +20,7 @@ from mjaigymml.trainer import Trainer
 
 
 TEST_DATASET = multiprocessing.Queue()
+EXIT_NEED = False
 
 
 def get_test_dataset(test_mjson_storage):
@@ -59,7 +60,7 @@ def run_extract_process(
     """
     特徴量抽出を行う
     """
-
+    global EXIT_NEED
     lgs.info("start extract process")
 
     cpu_num = multiprocessing.cpu_count()
@@ -73,6 +74,9 @@ def run_extract_process(
         one_chunk = []
         with tqdm(total=train_mjson_storage.max_num) as t:
             for mjson in train_mjson_storage.get_mjsons():
+                if EXIT_NEED:
+                    return
+
                 one_chunk.append(
                     (mjson, analyser, dataset_queue, train_config))
 
@@ -147,20 +151,23 @@ def run(
     mlflow.log_params(train_config.get_dict())
     mlflow.log_param("extract_config", extract_config.get_json())
 
-    p.start()
-
     # 学習の実行
-    trainer.train_loop(
-        model,
-        dataset_queue,
-        p,
-        train_config,
-        model_config,
-        model_save_dir,
-        load_model_file
-    )
+    try:
+        p.start()
+        trainer.train_loop(
+            model,
+            dataset_queue,
+            p,
+            train_config,
+            model_config,
+            model_save_dir,
+            load_model_file
+        )
 
-    p.join()
+        p.join()
+    finally:
+        global EXIT_NEED
+        EXIT_NEED = True
 
 
 if __name__ == "__main__":
