@@ -372,7 +372,7 @@ class ChiModel(BinaryModel):
 
 
 class KanModel(BinaryModel):
-    POS_NEG_RATE = torch.Tensor([20.0]).float().to(DEVICE)
+    POS_NEG_RATE = torch.Tensor([10.0]).float().to(DEVICE)
 
     def get_criterion(self):
         # for imbalanced data
