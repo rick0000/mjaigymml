@@ -5,6 +5,7 @@ common:
   doraV0.py: DoraV0
   kyotakuV0.py: KyotakuV0
   honbaV0.py: HonbaV0
+  
 
 on_reach_dahai: 
   # 持ち点、手牌、副露牌などプレーヤーごとに異なる特徴量
@@ -17,6 +18,7 @@ on_reach_dahai:
   discardV0.py: DiscardV0
   discard_reach_stateV0.py: DiscardReachStateV0
   anpaiV0.py: AnpaiV0
+  score_diffV0.py: ScoreDiffV0
 
 on_reach_dahai_oracle: 
   # oracle特徴量

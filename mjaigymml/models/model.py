@@ -633,7 +633,7 @@ class DahaiModel(Model):
                 oracle_zeros,  # kamicha
             ], axis=0)
         else:
-            print("use oracle feature")
+            # print("use oracle feature")
             oracle_zeros = np.zeros_like(
                 dataset.feature.reach_dahai_oracle_feature[actor])
             concated = np.concatenate([

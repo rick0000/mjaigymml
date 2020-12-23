@@ -1,17 +1,18 @@
 from mjaigymml.models.model import DahaiModel, ReachModel, ChiModel, PonModel, KanModel
 from mjaigymml.config.model_config import ModelConfig
+from mjaigymml.config.train_config import TrainConfig
 
 
 class ModelFactory:
     @classmethod
     def get_model(
             cls,
-            model_type: str,
+            train_config: TrainConfig,
             model_config: ModelConfig,
             reach_dahai_feature_length: int,
             pon_chi_kan_feature_length: int,
     ):
-
+        model_type = train_config.model_type
         if model_type not in [
             "dahai", "reach", "pon", "kan", "chi"
         ]:
@@ -20,7 +21,8 @@ class ModelFactory:
         if model_type == "dahai":
             return cls._get_dahai_model(
                 model_config,
-                reach_dahai_feature_length)
+                reach_dahai_feature_length,
+                train_config.use_oracle)
         elif model_type == "reach":
             return cls._get_reach_model(
                 model_config,
@@ -41,13 +43,23 @@ class ModelFactory:
         raise Exception("not intended path")
 
     @classmethod
-    def _get_dahai_model(cls, model_config: ModelConfig, feature_length: int):
+    def _get_dahai_model(
+            cls,
+            model_config: ModelConfig,
+            feature_length: int,
+            use_oracle: bool,
+    ):
+        if use_oracle:
+            oracle_rate = 1.0
+        else:
+            oracle_rate = 0.0
         return DahaiModel(
             feature_length,
             model_config.mid_channels,
             model_config.resnet_repeat,
             model_config.learning_rate,
-            model_config.batch_size
+            model_config.batch_size,
+            oracle_rate
         )
 
     @classmethod

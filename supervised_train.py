@@ -14,7 +14,10 @@ from mjaigymml.config.extract_config import ExtractConfig
 from mjaigymml.config.train_config import TrainConfig
 from mjaigymml.config.model_config import ModelConfig
 from loggers import logger_main as lgs
+from mjaigymml.models.model_factory import ModelFactory
+from mjaigymml.trainer import Trainer
 # import objgraph
+
 
 TEST_DATASET = multiprocessing.Queue()
 
@@ -125,16 +128,15 @@ def run(
 
     # 特徴量消費側定義
     # モデル定義
-    from mjaigymml.models.model_factory import ModelFactory
 
     model = ModelFactory.get_model(
-        train_config.model_type,
+        train_config,
         model_config,
         analyser.get_reach_dahai_feature_length(),
         analyser.get_pon_chi_kan_feature_length(),
     )
     # 学習の定義
-    from mjaigymml.trainer import Trainer
+
     trainer = Trainer()
 
     mlflow.set_experiment(train_config.model_type)
