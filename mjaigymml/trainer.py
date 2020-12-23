@@ -72,6 +72,10 @@ class Trainer():
                     if not feature_generate_process.is_alive():
                         lgs.logger_main.info(
                             "generate process finished, end train.")
+                        output_path = Path(model_save_dir) / \
+                            train_config.model_type / f"{game_count}.pth"
+                        output_path.parent.mkdir(parents=True, exist_ok=True)
+                        model.save(output_path)
                         return
             else:
                 lgs.logger_main.info("filled queue, start train")

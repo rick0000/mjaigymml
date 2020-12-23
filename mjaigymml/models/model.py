@@ -379,14 +379,7 @@ class KanModel(BinaryModel):
         return nn.BCEWithLogitsLoss(pos_weight=KanModel.POS_NEG_RATE)
 
     def _calc_feature(self, dataset: Dataset):
-        if dataset.label.next_action_type is not None:
-            actor = dataset.label.next_action['actor']
-        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
-            actor = dataset.board_state.previous_action['actor']
-        else:
-            import pdb
-            pdb.set_trace()
-            raise Exception("not implemented")
+        actor = dataset.candidate_action['actor']
         shimocha = (actor + 1) % 4
         toimen = (actor + 2) % 4
         kamicha = (actor + 3) % 4
