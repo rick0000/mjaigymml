@@ -33,17 +33,22 @@ def get_test_dataset(test_mjson_storage):
 
 
 def _run_onegame_analyze(args):
+    try:
+        mjson, analyser, dataset_queue, train_config = args
+        datasets = analyser.analyse_mjson(mjson)
+        # extract and sampling.
+        datasets = analyser.filter_datasets(datasets, train_config)
+        if len(datasets) == 0:
+            return
+        # calc_feature() updates datasets object
+        analyser.calc_feature(datasets)
 
-    mjson, analyser, dataset_queue, train_config = args
-    datasets = analyser.analyse_mjson(mjson)
-    # extract and sampling.
-    datasets = analyser.filter_datasets(datasets, train_config)
-    if len(datasets) == 0:
-        return
-    # calc_feature() updates datasets object
-    analyser.calc_feature(datasets)
-
-    dataset_queue.put(datasets)
+        dataset_queue.put(datasets)
+    except KeyboardInterrupt:
+        raise
+    except Exception as e:
+        print(e)
+        pass
 
 
 def run_extract_process(
