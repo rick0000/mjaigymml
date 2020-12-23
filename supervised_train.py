@@ -33,22 +33,17 @@ def get_test_dataset(test_mjson_storage):
 
 
 def _run_onegame_analyze(args):
-    try:
-        mjson, analyser, dataset_queue, train_config = args
-        datasets = analyser.analyse_mjson(mjson)
-        # extract and sampling.
-        datasets = analyser.filter_datasets(datasets, train_config)
-        if len(datasets) == 0:
-            return
-        # calc_feature() updates datasets object
-        analyser.calc_feature(datasets)
 
-        dataset_queue.put(datasets)
-    except KeyboardInterrupt:
+    mjson, analyser, dataset_queue, train_config = args
+    datasets = analyser.analyse_mjson(mjson)
+    # extract and sampling.
+    datasets = analyser.filter_datasets(datasets, train_config)
+    if len(datasets) == 0:
         return
-    except Exception as e:
-        print(e)
-        return
+    # calc_feature() updates datasets object
+    analyser.calc_feature(datasets)
+
+    dataset_queue.put(datasets)
 
 
 def run_extract_process(
@@ -82,15 +77,17 @@ def run_extract_process(
 
                 if len(one_chunk) < 128:
                     continue
-
-                with multiprocessing.Pool(processes=cpu_num) as pool:
-                    for _ in pool.imap_unordered(_run_onegame_analyze,
-                                                 one_chunk):
-                        t.update(1)
-                    pool.close()
-                one_chunk.clear()
-
-                # objgraph.show_growth()
+                try:
+                    with multiprocessing.Pool(processes=cpu_num) as pool:
+                        for _ in pool.imap_unordered(_run_onegame_analyze,
+                                                     one_chunk):
+                            t.update(1)
+                        pool.close()
+                    one_chunk.clear()
+                except Exception as e:
+                    print(e)
+                    raise
+                    # objgraph.show_growth()
 
 
 def run(
@@ -163,8 +160,6 @@ def run(
             model_save_dir,
             load_model_file
         )
-
-        p.join()
     finally:
         global EXIT_NEED
         EXIT_NEED = True
