@@ -15,7 +15,10 @@ class Trainer():
     def __init__(
         self,
     ):
-        pass
+        self.kill_required = False
+
+    def kill(self):
+        self.kill_required = True
 
     def train_loop(
             self,
@@ -62,7 +65,9 @@ class Trainer():
         replay_buffer_length = min(10000, chunk_length * 10)
         replay_buffer = deque(maxlen=replay_buffer_length)
         while True:
-
+            if self.kill_required:
+                return
+                
             if len(datasets) < chunk_length:
                 try:
                     one_mjson_dataset = dataset_queue.get(timeout=1)
