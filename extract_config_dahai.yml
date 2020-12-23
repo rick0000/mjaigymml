@@ -1,0 +1,32 @@
+# ファイル名: クラス名 のように記載する。
+
+common:
+  # ドラ表、山残り枚数などすべてのプレーヤーについて共通の特徴量
+  doraV0.py: DoraV0
+  kyotakuV0.py: KyotakuV0
+  honbaV0.py: HonbaV0
+
+on_reach_dahai: 
+  # 持ち点、手牌、副露牌などプレーヤーごとに異なる特徴量
+  # すべてのアクションについて抽出する特徴量
+  oyaV0.py: OyaV0
+  reachV0.py: ReachV0
+  chiV0.py: ChiV0
+  ponV0.py: PonV0
+  kanV0.py: KanV0
+  discardV0.py: DiscardV0
+  discard_reach_stateV0.py: DiscardReachStateV0
+  anpaiV0.py: AnpaiV0
+
+on_reach_dahai_oracle: 
+  # oracle特徴量
+  dfsV0.py: DfsV0
+  shantenV0.py: ShantenV0
+  tehai_numV0.py: TehaiNumV0
+  rest_pai_in_viewV0: RestPaiInViewV0
+
+
+on_pon_chi_kan:
+  # ポン、チー、カンのときのみ抽出する特徴量
+  furo_candidateV0.py: FuroCandidateV0
+
