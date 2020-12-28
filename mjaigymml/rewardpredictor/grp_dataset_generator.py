@@ -34,6 +34,8 @@ def generate_df_from_mjson(mjson: Mjson) -> pd.DataFrame:
             "before_scores": before_scores,
             "end_scores": end_scores,
             "diff": diff,
+            "target_score": mjson.game.game_result_score,
+            "target_label": mjson.game.game_result_label,
         }
         datas.append(record)
 

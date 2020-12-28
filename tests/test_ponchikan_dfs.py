@@ -5,14 +5,9 @@ import numpy as np
 import conftest
 from mjaigym.board.function.pai import Pai
 from mjaigym.board.function.yaku_name import YAKU_CHANNEL_MAP
-# from mjaigym.board.function.dfs_result import DfsResult
+
 from mjaigym.board.function.efficient_dfs import Dfs
-from mjaigym.board.function.rs_shanten_analysis import RsShantenAnalysis
 from mjaigym.board import Board
-from mjaigym.board import BoardState
-from mjaigymml.features.custom.feature_reach_dahai import FeatureReachDahai
-
-
 from mjaigymml.features.custom.pon_chi_kan.pon_chi_kan_dfsV0 import PonChiKanDfsV0
 
 
@@ -26,7 +21,8 @@ def test_pon_chi_kan_dfs():
         if state.previous_action['type'] == "dahai":
             dahai_count += 1
 
-        if dahai_count > 15 and state.previous_action['type'] == "tsumo":
+        if dahai_count > 15 and state.previous_action['type'] == "dahai":
+            # 15回以上モータして誰かがdahaiした瞬間の場面で停止
             break
 
         actions = {}
@@ -37,7 +33,7 @@ def test_pon_chi_kan_dfs():
         board.step(actions)
 
     # 先読み特徴量のテスト
-    target_player = state.previous_action['actor']
+    target_player = (state.previous_action['actor'] + 1) % 4
 
     extractor = PonChiKanDfsV0()
     result = np.zeros((extractor.get_length(), 34))
@@ -56,12 +52,18 @@ def test_pon_chi_kan_dfs():
     board_state.state['oya'] = (target_player + 1) % 4
 
     print("before")
-    print(result)
+    print(result.sum())
     output = result.copy()
+    dummy_furo = {"type": "chi", "actor": target_player}
     # 特徴量の計算
-    extractor.calc(output, board_state, target_player)
+    extractor.calc(
+        output,
+        board_state,
+        target_player,
+        dummy_furo
+    )
     print("after")
-    print(output)
+    print(output.sum())
     assert (result != output).any()
 
     # 一気通貫のテンパイ。あと9mが来れば一気通貫になる。不要牌C
@@ -78,7 +80,7 @@ def test_pon_chi_kan_dfs():
         Pai.from_str("E").id] == 1
 
     # (8000点, C, あと1枚）の場所にフラグが立っているか
-    point_target_index = extractor.target_points.index(8000)
+    point_target_index = extractor.target_points.index(7700)
     print("point_target_index", point_target_index)
     assert output[
         point_target_index +

@@ -6,14 +6,12 @@ import conftest
 from mjaigym.board.function.pai import Pai
 from mjaigym.board.function.yaku_name import YAKU_CHANNEL_MAP
 # from mjaigym.board.function.dfs_result import DfsResult
-from mjaigym.board.function.efficient_dfs import Dfs
+# from mjaigym.board.function.efficient_dfs import Dfs
 from mjaigym.board.function.rs_shanten_analysis import RsShantenAnalysis
 from mjaigym.board import Board
 from mjaigym.board import BoardState
 from mjaigymml.features.custom.feature_reach_dahai import FeatureReachDahai
-
-
-from mjaigymml.features.custom.reach_dahai.dfsV0 import DfsV0
+from mjaigymml.features.custom.reach_dahai_oracle.dfsV0 import DfsV0
 
 
 def test_horapoint_dfs():
