@@ -12,11 +12,15 @@ class GrpDataset:
         before_scores,
         end_scores,
         label_scores,
+        kyoku=1,
+        bakaze="E",
         honba=0,
         chicha=0,
         oya=0,
         kyotaku=0,
     ):
+        self.kyoku = kyoku
+        self.bakaze = bakaze
         self.honba = honba
         self.chicha = chicha
         self.oya = oya
@@ -70,15 +74,17 @@ class GrpDataset:
     def label_class(self):
         # oya, shimocha, toimen, kamichaの順位は24パターンに分類できるため
         # 0~15のクラス番号を返す
-
         return self._get_class_label(self.oya_oriented_ranks)
 
     @property
     def feature(self):
         return {
+            "kyoku": self.kyoku,
+            "bakaze": self.bakaze,
             "honba": self.honba,
             "kyotaku": self.kyotaku,
             "oya": self.oya,
+            "chicha": self.chicha,
             "before_score_oya": self.before_scores[self.oya],
             "before_score_shimocha": self.before_scores[self.shimocha],
             "before_score_toimen": self.before_scores[self.toimen],
@@ -117,7 +123,7 @@ class GrpDataset:
         output:
             14
         """
-        rank_label = _ranks.index(ranks)
+        rank_label = RANKS.index(ranks)
         return rank_label
 
     def probs_to_each_ranks(self, class_probs):
@@ -142,7 +148,7 @@ class GrpDataset:
             [0]*4,  # toimen
             [0]*4,  # kamicha
         ]
-        for class_ranks, class_prob in zip(_ranks, class_probs):
+        for class_ranks, class_prob in zip(RANKS, class_probs):
             # print(class_ranks, class_prob)
             for player in range(4):
                 player_rank = class_ranks[player]
@@ -151,7 +157,7 @@ class GrpDataset:
         return oya_oriented_rank_probs
 
 
-_ranks = [
+RANKS = [
     [0, 1, 2, 3],
     [0, 1, 3, 2],
     [0, 2, 1, 3],
