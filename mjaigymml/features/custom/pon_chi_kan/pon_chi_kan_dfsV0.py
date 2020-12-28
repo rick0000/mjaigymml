@@ -70,9 +70,6 @@ class PonChiKanDfsV0(FeaturePonChiKan):
         player_furos = board_state.furos[player_id]
 
         # 副露適用
-        import pdb
-        pdb.set_trace()
-
         furo_akadora_num = 0
         for furo in player_furos:
             furo_akadora_num += len([p for p in furo.pais if p.is_red])
