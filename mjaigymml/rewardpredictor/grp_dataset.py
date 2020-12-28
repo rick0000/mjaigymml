@@ -120,13 +120,13 @@ class GrpDataset:
         rank_label = _ranks.index(ranks)
         return rank_label
 
-    def probs_to_each_ranks(self, probs):
+    def probs_to_each_ranks(self, class_probs):
         """
         24パターンで表されている予測順位確率を
         oya, shimocha, toimen, kamicha ごとの順位確率に変換する
 
         input:
-            probs: List[float]      # len(prob) == 24
+            class_probs: List[float]      # len(prob) == 24
 
         output:
         {
@@ -142,8 +142,11 @@ class GrpDataset:
             [0]*4,  # toimen
             [0]*4,  # kamicha
         ]
-        for ranks, probs in zip(_ranks, probs):
-            print(ranks, probs)
+        for class_ranks, class_prob in zip(_ranks, class_probs):
+            # print(class_ranks, class_prob)
+            for player in range(4):
+                player_rank = class_ranks[player]
+                oya_oriented_rank_probs[player][player_rank] += class_prob
 
         return oya_oriented_rank_probs
 
