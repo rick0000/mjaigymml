@@ -1,4 +1,4 @@
-from typing import List
+
 from collections import ChainMap
 
 
@@ -8,7 +8,8 @@ DIV = 1
 class GrpDataset:
     """
     dataset for grobal reward predictor.
-    input data scores index0 is seat0 score, output feature scores index0 is oya score.
+    input data scores index0 is seat0 score, 
+    output feature scores index0 is oya score.
     """
 
     def __init__(
@@ -49,8 +50,6 @@ class GrpDataset:
         # for offset in range(4):
         #     # 起家が0、ラス親が3になる。
         #     seat_priority[(self.chicha+offset) % 4] = offset
-
-        # self.oya_oriented_seat_priority = self.get_oya_oriented(seat_priority)
 
         self.ranks = self._get_ranks(
             self._raw_label_scores,

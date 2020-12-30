@@ -107,7 +107,7 @@ class FeatureAnalyser():
         for extractor in self.pon_chi_kan_extractors:
             extractor.reset()
 
-    def analyze_list(self, mjson_list: List[Dict]) -> Dataset:
+    def analyze_list(self, mjson_list: List[Dict], scores: List[int]) -> Dataset:
         """
         辞書のリストで与えられたアクションの履歴について特徴量の算出を行う。
         全アクションではなく最後の状態についてのみ特徴量の算出を行う。
@@ -146,15 +146,15 @@ class FeatureAnalyser():
             score_diff_2=0,
             score_diff_3=0,
 
-            initial_score_0=25000,
-            initial_score_1=25000,
-            initial_score_2=25000,
-            initial_score_3=25000,
+            initial_score_0=scores[0],
+            initial_score_1=scores[1],
+            initial_score_2=scores[2],
+            initial_score_3=scores[3],
 
-            end_score_0=25000,
-            end_score_1=25000,
-            end_score_2=25000,
-            end_score_3=25000,
+            end_score_0=scores[0],
+            end_score_1=scores[1],
+            end_score_2=scores[2],
+            end_score_3=scores[3],
 
             next_action_type=None,
             next_action=None,

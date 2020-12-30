@@ -7,7 +7,7 @@ import pprint
 from sklearn.metrics import confusion_matrix
 
 from mjaigymml.rewardpredictor.model import \
-    Model, LogisticRegressionModel, LGBModel
+    Model, LogisticRegressionModel
 from mjaigymml.rewardpredictor.grp_dataset import GrpDataset
 
 
@@ -23,7 +23,6 @@ class GlobalRewardPredictor:
         "oya",
         "max_over_30000",
         "diff_0", "diff_1", "diff_2", "diff_3",
-        # "end_score_oya", "end_score_shimocha", "end_score_toimen", "end_score_kamicha",
         "before_score_0",
         "before_score_01", "before_score_02", "before_score_03",
         "before_score_12", "before_score_13",
