@@ -4,6 +4,9 @@ from pathlib import Path
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
+import xgboost as xgb
+import lightgbm as lgb
+from sklearn.model_selection import train_test_split
 
 
 class Model(object):
@@ -25,11 +28,13 @@ class Model(object):
         pickle.dump(self.model, file_path)
 
     def fit(self, feature: np.array, label: np.array):
-
         self.model.fit(feature, label)
 
     def predict(self, feature: np.array):
         return self.model.predict(feature)
+
+    def predict_proba(self, feature: np.array):
+        return self.model.predict_proba(feature)
 
     def get_model(self):
         raise NotImplementedError()
@@ -44,4 +49,85 @@ class LinearRegressionModel(Model):
 class LogisticRegressionModel(Model):
 
     def get_model(self):
-        return LogisticRegression()
+        return LogisticRegression(max_iter=1000)
+
+
+class LGBModel(Model):
+    def fit(self, feature: np.array, label: np.array):
+        sampled_index = np.random.choice(
+            np.array(range(len(feature))), min(100000, len(feature)))
+        train, val = train_test_split(sampled_index, test_size=0.33)
+        sampled_feature = feature.iloc[train]
+        sampled_label = label.iloc[train]
+        sampled_feature_val = feature.iloc[val]
+        sampled_label_val = label.iloc[val]
+
+        lgb_train = lgb.Dataset(sampled_feature, sampled_label)
+        lgb_eval = lgb.Dataset(sampled_feature_val,
+                               sampled_label_val, reference=lgb_train)
+        params = {
+            "objective": "multiclass",
+            "num_class": 24,
+            "verbose": 0,
+        }
+        self.model = lgb.train(
+            params=params,
+            train_set=lgb_train,
+            num_boost_round=500,
+            early_stopping_rounds=10,
+            valid_sets=lgb_eval,
+            # verbose_eval=False,
+        )
+
+    def predict(self, feature: np.array):
+        return np.argmax(self.model.predict(feature), axis=1)
+
+    def predict_proba(self, feature: np.array):
+        return self.model.predict(feature)
+
+    def get_model(self):
+        return None
+
+
+class XGBMModel(Model):
+
+    def fit(self, feature: np.array, label: np.array):
+        sampled_index = np.random.choice(np.array(range(len(feature))), 10000)
+        train, val = train_test_split(sampled_index, test_size=0.33)
+        sampled_feature = feature.iloc[train]
+        sampled_label = label.iloc[train]
+        sampled_feature_val = feature.iloc[val]
+        sampled_label_val = label.iloc[val]
+
+        params = {
+            "objective": "multi:softmax",
+            "num_class": 24,
+            "n_estimators": 2000,
+            "max_depth": 12,
+            "learning_rate": 0.1,
+            "subsample": 0.2,
+            "colsample_bytree": 1.0,
+            "missing": -1,
+            "eval_metric": 'auc',
+            "tree_method": 'gpu_hist',
+        }
+        train_config = {
+
+        }
+        trn_data = xgb.DMatrix(sampled_feature, sampled_label)
+        val_data = xgb.DMatrix(sampled_feature_val, sampled_label_val)
+        import pdb
+        pdb.set_trace()
+        self.model = xgb.train(params=params,
+                               dtrain=trn_data,
+                               early_stopping_rounds=100,
+                               evals=[(trn_data, "train"), (val_data, "val")])
+
+    def predict(self, feature: np.array):
+        return np.argmax(self.model.predict(feature), axis=1)
+
+    def predict_proba(self, feature: np.array):
+        return self.model.predict(feature)
+
+    def get_model(self):
+        return None

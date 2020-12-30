@@ -1,74 +1,166 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 from itertools import product
+import pickle
+import pprint
 
-from mjaigymml.rewardpredictor.model import Model, LogisticRegressionModel
+from sklearn.metrics import confusion_matrix
+
+from mjaigymml.rewardpredictor.model import \
+    Model, LogisticRegressionModel, XGBMModel, LGBModel
 from mjaigymml.rewardpredictor.grp_dataset import GrpDataset
 
 
 @dataclass
-class PredictResult:
-    player_id: int
-    rank_probs: List[float]  # { 1st, 2nd, 3rd, 4th probs }
-    class_probs: List[float]  # { 16 class probs }
-
-    def calc_rank_probs(self, seat):
-        pass
+class RankPredictResult:
+    seat_rank_probs: Dict[int, List[float]]
 
 
 class GlobalRewardPredictor:
-    NEED_COLUMNS = ["honba", "oya", "kyotaku", "before_scores", "end_scores"]
-    kyokus = list(product([1, 2, 3, 4], ("E", "S")))
+    NEED_COLUMNS = [
+        "honba",
+        "kyotaku",
+        "oya",
+        "max_over_30000",
+        "diff_0", "diff_1", "diff_2", "diff_3",
+        # "end_score_oya", "end_score_shimocha", "end_score_toimen", "end_score_kamicha",
+        "before_score_0",
+        "before_score_01", "before_score_02", "before_score_03",
+        "before_score_12", "before_score_13",
+        "before_score_23",
+    ]
+    KYOKUS = list(product([1, 2, 3, 4], ("E", "S")))
 
     def __init__(self, model_cls: Model):
         self.models = {}
-        for (kyoku_id, bakaze) in self.kyokus:
-            self.models[(kyoku_id, bakaze)] = model_cls()
+        for (kyoku, bakaze) in GlobalRewardPredictor.KYOKUS:
+            self.models[(kyoku, bakaze)] = model_cls()
 
-    @classmethod
-    def load(cls, file_path) -> "GlobalRewardPredictor":
-        pass
+    def load(self, file_path) -> "GlobalRewardPredictor":
+        with open(file_path, "rb") as f:
+            self.models = pickle.load(f)
 
     def save(self, file_path):
-        pass
+        with open(file_path, "wb") as f:
+            pickle.dump(self.models, f)
 
-    def predict(self, df) -> List[PredictResult]:
-        pass
+    def predict(
+            self,
+            before_scores,
+            end_scores,
+            kyoku,
+            bakaze,
+            honba,
+            chicha,
+            oya,
+            kyotaku,
+            is_tonnnan
+    ) -> List[RankPredictResult]:
+
+        # if tonpu, use S1, S2, S3, S4
+        if not is_tonnnan:
+            bakaze = "S"
+
+        data = GrpDataset(
+            before_scores=before_scores,
+            end_scores=end_scores,
+            label_scores=[0, 0, 0, 0],
+            kyoku=kyoku,
+            bakaze=bakaze,
+            honba=honba,
+            chicha=chicha,
+            oya=oya,
+            kyotaku=kyotaku
+        )
+        feature = data.feature
+        df = pd.DataFrame(
+            data=[feature], columns=GlobalRewardPredictor.NEED_COLUMNS)
+        preds = self.models[(kyoku, bakaze)].predict_proba(df.values)
+
+        oya_oriented_rank_probs = \
+            [GrpDataset.probs_to_each_ranks(p) for p in preds]
+
+        # convert from oya index0 to seat0 index0
+        results = []
+        for oya_oriented_rank_prob in oya_oriented_rank_probs:
+            record_results = {}
+            for i in range(4):
+                record_results[i] = oya_oriented_rank_prob[i]
+
+            results.append(RankPredictResult(record_results))
+        return results
 
     def train(self, df):
         for c in self.NEED_COLUMNS:
+            assert c in df.columns, f"{c} not found"
+
+        # remove tonpu
+        df = df[df["is_tonnnan"]]
+
+        for (kyoku, bakaze) in GlobalRewardPredictor.KYOKUS:
+            print("start train", bakaze, kyoku)
+            kyoku_df = df[(df["kyoku"] == kyoku)
+                          & (df["bakaze"] == bakaze)]
+            kyoku_df = kyoku_df.reset_index(drop=True)
+            print("kyoku_df.shape", kyoku_df.shape)
+            label = kyoku_df["label_class"]
+            feature = kyoku_df[self.NEED_COLUMNS]
+            self.models[(kyoku, bakaze)].fit(feature, label)
+
+    def evaluate(self, df):
+        for c in self.NEED_COLUMNS:
             assert c in df.columns
 
-        for (kyoku_id, bakaze) in self.kyokus:
-            kyoku_df = df[(df["kyoku_id"] == kyoku_id)
+        # remove tonpu
+        df = df[df["is_tonnnan"]]
+
+        for (kyoku, bakaze) in GlobalRewardPredictor.KYOKUS:
+            print("start evaluate", bakaze, kyoku)
+            kyoku_df = df[(df["kyoku"] == kyoku)
                           & (df["bakaze"] == bakaze)]
-            label = kyoku_df["target_label"]
+            kyoku_df = kyoku_df.reset_index(drop=True)
+            print("kyoku_df.shape", kyoku_df.shape)
+            label = kyoku_df["label_class"]
             feature = kyoku_df[self.NEED_COLUMNS]
-            self.models[(kyoku_id, bakaze)].fit(feature, label)
-
-    def _train_one_kyoku(self, df):
-        pass
-
-    def change_seat0_index0_to_oya_index0(
-            self,
-            scores: List[int],
-            oya: int
-    ) -> List[int]:
-        assert 0 <= oya <= 3
-        return scores[oya:] + scores[:oya]
-
-    def change_oya_index0_to_seat0_index0(
-            self,
-            preds: List[PredictResult],
-            oya: int
-    ) -> List[PredictResult]:
-        assert 0 <= oya <= 3
-        return preds[-oya:] + preds[:-oya]
+            result = self.models[(kyoku, bakaze)].predict(feature)
+            c_mat = confusion_matrix(label, result)
+            pprint.pprint(c_mat)
+            pd.DataFrame(c_mat).to_csv(f"eval_{bakaze}_{kyoku}.csv")
 
 
 if __name__ == "__main__":
     import pandas as pd
-    df = pd.read_pickle("output/dataset/test_grp_dataset.pkl")
 
-    grp = GlobalRewardPredictor(LogisticRegressionModel)
-    grp.train(df)
+    grp = GlobalRewardPredictor(LGBModel)
+    train = False
+    evaluate = False
+    if train:
+        df = pd.read_pickle("output/dataset/train_grp_dataset.pkl")
+
+        grp.train(df)
+        grp.save("sample_grp.pkl")
+
+    grp.load("sample_grp.pkl")
+    if evaluate:
+        df = pd.read_pickle("output/dataset/test_grp_dataset.pkl")
+
+        grp.evaluate(df)
+
+    kyoku = 2
+    bakaze = "S"
+    before_scores = [25000, 25000, 25000, 25000]
+    # end_scores = [11000, 25000, 39000, 24000]
+    end_scores = [25000, 25000, 25000, 25000]
+    print(bakaze, kyoku, before_scores, "->", end_scores)
+    preds = grp.predict(
+        before_scores=before_scores,
+        end_scores=end_scores,
+        kyoku=kyoku,
+        bakaze=bakaze,
+        honba=0,
+        chicha=0,
+        oya=3,
+        kyotaku=3,
+        is_tonnnan=True
+    )
+    print(preds)

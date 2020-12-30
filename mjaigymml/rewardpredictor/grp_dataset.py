@@ -1,4 +1,8 @@
 from typing import List
+from collections import ChainMap
+
+
+DIV = 1
 
 
 class GrpDataset:
@@ -25,30 +29,41 @@ class GrpDataset:
         self.chicha = chicha
         self.oya = oya
         self.kyotaku = kyotaku
-        self.before_scores = before_scores
-        self.end_scores = end_scores
-        self.label_scores = label_scores
+        self._before_scores = before_scores
+        self._end_scores = end_scores
+        self._diff = [e - b for (e, b) in zip(end_scores, before_scores)]
+        self._raw_label_scores = label_scores
 
-        # oyaがindex0になるように並び替え
-        self.oya_oriented_label_scores = [
-            self.label_scores[self.oya],
-            self.label_scores[self.shimocha],
-            self.label_scores[self.toimen],
-            self.label_scores[self.kamicha],
-        ]
+        # # oyaがindex0になるように並び替え
+        # self.oya_oriented_label_scores = \
+        #     self.get_oya_oriented(self._raw_label_scores)
+        # self.oya_oriented_before_scores = \
+        #     self.get_oya_oriented(self._before_scores)
+        # self.oya_oriented_end_scores = \
+        #     self.get_oya_oriented(self._end_scores)
+        # self.oya_oriented_diff = \
+        #     self.get_oya_oriented(self._diff)
 
         # 同点時の席優先度。小さいほど有利。
-        seat_priority = [0]*4
-        for offset in range(4):
-            # 起家が0、ラス親が3になる。
-            seat_priority[(self.chicha+offset) % 4] = offset
+        self.seat_priority = [0]*4
+        # for offset in range(4):
+        #     # 起家が0、ラス親が3になる。
+        #     seat_priority[(self.chicha+offset) % 4] = offset
 
-        self.oya_oriented_seat_priority = [
-            seat_priority[self.oya],
-            seat_priority[self.shimocha],
-            seat_priority[self.toimen],
-            seat_priority[self.kamicha],
-        ]
+        # self.oya_oriented_seat_priority = self.get_oya_oriented(seat_priority)
+
+        self.ranks = self._get_ranks(
+            self._raw_label_scores,
+            self.seat_priority
+        )
+
+    # def get_oya_oriented(self, scores):
+    #     return [
+    #         scores[self.oya],
+    #         scores[self.shimocha],
+    #         scores[self.toimen],
+    #         scores[self.kamicha],
+    #     ]
 
     @property
     def shimocha(self):
@@ -63,36 +78,74 @@ class GrpDataset:
         return (self.oya+3) % 4
 
     @property
-    def oya_oriented_ranks(self):
-        # oya, shimocha, toimen, kamichaの順位を返す
-        return self._get_ranks(
-            self.oya_oriented_label_scores,
-            self.oya_oriented_seat_priority
+    def labels(self):
+        return ChainMap(
+            self.label_class,
+            self.label_ranks,
+            self.label_scores
         )
 
     @property
     def label_class(self):
-        # oya, shimocha, toimen, kamichaの順位は24パターンに分類できるため
-        # 0~15のクラス番号を返す
-        return self._get_class_label(self.oya_oriented_ranks)
+        # 順位は24パターンに分類できるため
+        # 0~23のクラス番号を返す
+        return {
+            "label_class": self._get_class_label(self.ranks)
+        }
+
+    @property
+    def label_scores(self):
+        # 最終点数を返す
+        return {
+            "label_score_0": self._end_scores[0],
+            "label_score_1": self._end_scores[1],
+            "label_score_2": self._end_scores[2],
+            "label_score_3": self._end_scores[3],
+        }
+
+    @property
+    def label_ranks(self):
+        # 最終順位を返す
+        return {
+            "label_rank_0": self.ranks[0],
+            "label_rank_1": self.ranks[1],
+            "label_rank_2": self.ranks[2],
+            "label_rank_3": self.ranks[3],
+        }
 
     @property
     def feature(self):
+
         return {
             "kyoku": self.kyoku,
             "bakaze": self.bakaze,
-            "honba": self.honba,
-            "kyotaku": self.kyotaku,
+            "honba": self.honba*300/DIV,
+            "kyotaku": self.kyotaku*1000/DIV,
             "oya": self.oya,
-            "chicha": self.chicha,
-            "before_score_oya": self.before_scores[self.oya],
-            "before_score_shimocha": self.before_scores[self.shimocha],
-            "before_score_toimen": self.before_scores[self.toimen],
-            "before_score_kamicha": self.before_scores[self.kamicha],
-            "end_score_oya": self.before_scores[self.oya],
-            "end_score_shimocha": self.end_scores[self.shimocha],
-            "end_score_toimen": self.end_scores[self.toimen],
-            "end_score_kamicha": self.end_scores[self.kamicha],
+            "max_over_30000": max(self._end_scores) >= 30000,
+            "diff_0": self._diff[0]/DIV,
+            "diff_1": self._diff[1]/DIV,
+            "diff_2": self._diff[2]/DIV,
+            "diff_3": self._diff[3]/DIV,
+            "before_score_0": self._before_scores[0]/DIV,
+            "before_score_01":
+                (self._before_scores[0] -
+                 self._before_scores[1])/DIV,
+            "before_score_02":
+                (self._before_scores[0] -
+                 self._before_scores[2])/DIV,
+            "before_score_03":
+                (self._before_scores[0] -
+                 self._before_scores[3])/DIV,
+            "before_score_12":
+                (self._before_scores[1] -
+                 self._before_scores[2])/DIV,
+            "before_score_13":
+                (self._before_scores[1] -
+                 self._before_scores[3])/DIV,
+            "before_score_23":
+                (self._before_scores[2] -
+                 self._before_scores[3])/DIV,
         }
 
     def _get_ranks(self, scores, priority):
@@ -108,10 +161,22 @@ class GrpDataset:
         """
 
         rank_score_priority_sorted = sorted(
-            zip(range(4), scores, priority),
+            [z for z in zip(range(4), scores, priority)
+             ],  # seat, score, priority
             key=lambda x: (-x[1], x[2]),  # 得点が大きい、席優先度が小さい順に並ぶ。
         )
-        return [rank for (rank, score, priority) in rank_score_priority_sorted]
+
+        seat_ranks = [rank for (rank, score, priority)
+                      in rank_score_priority_sorted]
+
+        ranks = [
+            seat_ranks.index(0),  # 席が0の人のランク
+            seat_ranks.index(1),
+            seat_ranks.index(2),
+            seat_ranks.index(3),
+        ]
+
+        return ranks
 
     def _get_class_label(self, ranks):
         """
@@ -126,7 +191,8 @@ class GrpDataset:
         rank_label = RANKS.index(ranks)
         return rank_label
 
-    def probs_to_each_ranks(self, class_probs):
+    @classmethod
+    def probs_to_each_ranks(cls, class_probs):
         """
         24パターンで表されている予測順位確率を
         oya, shimocha, toimen, kamicha ごとの順位確率に変換する
@@ -186,3 +252,11 @@ RANKS = [
     [3, 2, 0, 1],
     [3, 2, 1, 0],
 ]
+
+if __name__ == "__main__":
+    gd = GrpDataset(
+        [10000, 20000, 50000, 30000],
+        [10000, 20000, 50000, 30000],
+        [10000, 20000, 50000, 30000],
+    )
+    print(gd.ranks)

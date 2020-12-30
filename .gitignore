@@ -7,3 +7,4 @@ experiments
 outputs
 output
 cache
+*.csv
