@@ -5,6 +5,7 @@ import pickle
 import pprint
 
 from sklearn.metrics import confusion_matrix
+import pandas as pd
 
 from mjaigymml.rewardpredictor.model import \
     Model, LogisticRegressionModel
