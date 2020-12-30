@@ -7,7 +7,7 @@ import pprint
 from sklearn.metrics import confusion_matrix
 
 from mjaigymml.rewardpredictor.model import \
-    Model, LogisticRegressionModel, XGBMModel, LGBModel
+    Model, LogisticRegressionModel, LGBModel
 from mjaigymml.rewardpredictor.grp_dataset import GrpDataset
 
 
@@ -77,15 +77,15 @@ class GlobalRewardPredictor:
             data=[feature], columns=GlobalRewardPredictor.NEED_COLUMNS)
         preds = self.models[(kyoku, bakaze)].predict_proba(df.values)
 
-        oya_oriented_rank_probs = \
+        rank_probs = \
             [GrpDataset.probs_to_each_ranks(p) for p in preds]
 
         # convert from oya index0 to seat0 index0
         results = []
-        for oya_oriented_rank_prob in oya_oriented_rank_probs:
+        for rank_prob in rank_probs:
             record_results = {}
             for i in range(4):
-                record_results[i] = oya_oriented_rank_prob[i]
+                record_results[i] = rank_prob[i]
 
             results.append(RankPredictResult(record_results))
         return results
@@ -131,26 +131,29 @@ class GlobalRewardPredictor:
 if __name__ == "__main__":
     import pandas as pd
 
-    grp = GlobalRewardPredictor(LGBModel)
+    use_class = LogisticRegressionModel
+    class_name = use_class().__class__.__name__
+    grp = GlobalRewardPredictor(use_class)
     train = False
     evaluate = False
     if train:
         df = pd.read_pickle("output/dataset/train_grp_dataset.pkl")
 
         grp.train(df)
-        grp.save("sample_grp.pkl")
+        grp.save(f"grp_{class_name}.pkl")
 
-    grp.load("sample_grp.pkl")
+    grp.load(f"grp_{class_name}.pkl")
+
     if evaluate:
         df = pd.read_pickle("output/dataset/test_grp_dataset.pkl")
 
         grp.evaluate(df)
 
-    kyoku = 2
+    kyoku = 4
     bakaze = "S"
     before_scores = [25000, 25000, 25000, 25000]
     # end_scores = [11000, 25000, 39000, 24000]
-    end_scores = [25000, 25000, 25000, 25000]
+    end_scores = [25000, 25000, 24000, 26000]
     print(bakaze, kyoku, before_scores, "->", end_scores)
     preds = grp.predict(
         before_scores=before_scores,
