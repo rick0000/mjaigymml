@@ -4,8 +4,6 @@ from pathlib import Path
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
-import xgboost as xgb
-import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 
 
@@ -54,6 +52,7 @@ class LogisticRegressionModel(Model):
 
 class LGBModel(Model):
     def fit(self, feature: np.array, label: np.array):
+        import lightgbm as lgb
         sampled_index = np.random.choice(
             np.array(range(len(feature))), min(100000, len(feature)))
         train, val = train_test_split(sampled_index, test_size=0.33)
