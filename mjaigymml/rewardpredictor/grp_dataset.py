@@ -51,7 +51,7 @@ class GrpDataset:
         #     # 起家が0、ラス親が3になる。
         #     seat_priority[(self.chicha+offset) % 4] = offset
 
-        self.ranks = self._get_ranks(
+        self.ranks = self.get_ranks(
             self._raw_label_scores,
             self.seat_priority
         )
@@ -89,7 +89,7 @@ class GrpDataset:
         # 順位は24パターンに分類できるため
         # 0~23のクラス番号を返す
         return {
-            "label_class": self._get_class_label(self.ranks)
+            "label_class": self.get_class_label(self.ranks)
         }
 
     @property
@@ -147,7 +147,8 @@ class GrpDataset:
                  self._before_scores[3])/DIV,
         }
 
-    def _get_ranks(self, scores, priority):
+    @classmethod
+    def get_ranks(cls, scores, priority):
         """
         点数リストをもとに順位を計算する。
         出力の値は 0:1st, 1: 2nd, 2: 3rd, 3: 4th
@@ -177,7 +178,8 @@ class GrpDataset:
 
         return ranks
 
-    def _get_class_label(self, ranks):
+    @classmethod
+    def get_class_label(cls, ranks):
         """
         4人の順位のリストを24クラスに変換する
         ---
