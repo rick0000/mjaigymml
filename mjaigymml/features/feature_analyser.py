@@ -107,7 +107,12 @@ class FeatureAnalyser():
         for extractor in self.pon_chi_kan_extractors:
             extractor.reset()
 
-    def analyze_list(self, mjson_list: List[Dict], scores: List[int]) -> Dataset:
+    def analyze_list(
+            self,
+            mjson_list: List[Dict],
+            scores: List[int],
+            kyotaku: int,
+    ) -> Dataset:
         """
         辞書のリストで与えられたアクションの履歴について特徴量の算出を行う。
         全アクションではなく最後の状態についてのみ特徴量の算出を行う。
@@ -134,7 +139,7 @@ class FeatureAnalyser():
             kyoku=start_kyoku_line["kyoku"],
             bakaze=start_kyoku_line["bakaze"],
             honba=start_kyoku_line["honba"],
-            kyotaku=start_kyoku_line["kyotaku"],
+            kyotaku=kyotaku,
             dahai=dahai,
             reach=reach,
             chi=chi,
