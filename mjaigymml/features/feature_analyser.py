@@ -111,7 +111,6 @@ class FeatureAnalyser():
             self,
             mjson_list: List[Dict],
             scores: List[int],
-            kyotaku: int,
     ) -> Dataset:
         """
         辞書のリストで与えられたアクションの履歴について特徴量の算出を行う。
@@ -135,11 +134,11 @@ class FeatureAnalyser():
             mjson_line_index=len(mjson_list)-1,
             kyoku_line_index=len(mjson_list)-1,
             kyoku_line_num=len(mjson_list),
-            kyoku_index=start_kyoku_line["kyoku"],
-            kyoku=start_kyoku_line["kyoku"],
-            bakaze=start_kyoku_line["bakaze"],
-            honba=start_kyoku_line["honba"],
-            kyotaku=kyotaku,
+            kyoku_index=board_state.kyoku,
+            kyoku=board_state.kyoku,
+            bakaze=board_state.bakaze,
+            honba=board_state.honba,
+            kyotaku=board_state.kyotaku,
             dahai=dahai,
             reach=reach,
             chi=chi,
