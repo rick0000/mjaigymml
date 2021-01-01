@@ -608,7 +608,7 @@ class DahaiModel(Model):
     def _calc_feature(self, dataset: Dataset):
         if dataset.label.next_action_type is not None:
             actor = dataset.label.next_action['actor']
-        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach"]:
+        elif dataset.board_state.previous_action["type"] in ["tsumo", "reach", "chi", "pon", "daiminkan", "kakan", "ankan"]:
             actor = dataset.board_state.previous_action['actor']
         else:
             import pdb

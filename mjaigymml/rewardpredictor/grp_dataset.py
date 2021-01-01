@@ -154,10 +154,10 @@ class GrpDataset:
         出力の値は 0:1st, 1: 2nd, 2: 3rd, 3: 4th
         ---
         input:
-            [10000, 20000, 50000, 30000]
+            [10000, 10000, 60000, 30000]
 
         output:
-            [3, 2, 0, 1]
+            [2, 3, 0, 1]
         """
 
         rank_score_priority_sorted = sorted(
