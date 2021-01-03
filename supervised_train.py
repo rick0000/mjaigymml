@@ -107,7 +107,10 @@ def run(
 
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
-        train_mjson_dir, 400000)
+        input_dir=train_mjson_dir,
+        max_num=400000,
+        glob_regex="**/*.mjson",  # 対象ファイルの正則表現
+    )
     # test_mjson_storage = LocalFileMjsonStorage(
     #     test_mjson_dir, 100)
 
