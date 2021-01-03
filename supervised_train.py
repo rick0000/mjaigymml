@@ -20,7 +20,6 @@ from mjaigymml.trainer import Trainer
 
 
 TEST_DATASET = multiprocessing.Queue()
-EXIT_NEED = False
 
 
 def get_test_dataset(test_mjson_storage):
@@ -60,7 +59,7 @@ def run_extract_process(
     """
     特徴量抽出を行う
     """
-    global EXIT_NEED
+    exit_need = False
     lgs.info("start extract process")
 
     cpu_num = multiprocessing.cpu_count()
@@ -74,7 +73,7 @@ def run_extract_process(
         one_chunk = []
         with tqdm(total=train_mjson_storage.max_num) as t:
             for mjson in train_mjson_storage.get_mjsons():
-                if EXIT_NEED:
+                if exit_need:
                     return
 
                 one_chunk.append(
@@ -82,6 +81,7 @@ def run_extract_process(
 
                 if len(one_chunk) < 128:
                     continue
+
                 try:
                     with multiprocessing.Pool(processes=cpu_num) as pool:
                         for _ in pool.imap_unordered(_run_onegame_analyze,
@@ -91,8 +91,7 @@ def run_extract_process(
                     one_chunk.clear()
                 except Exception as e:
                     print(e)
-                    raise
-                    # objgraph.show_growth()
+                    exit_need = True
 
 
 def run(
@@ -107,7 +106,7 @@ def run(
 
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
-        train_mjson_dir, 400000)  # 10000牌譜ファイル分抽出
+        train_mjson_dir, 1)  # 10000牌譜ファイル分抽出
     # test_mjson_storage = LocalFileMjsonStorage(
     #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
 
@@ -154,20 +153,17 @@ def run(
     mlflow.log_param("extract_config", extract_config.get_json())
 
     # 学習の実行
-    try:
-        p.start()
-        trainer.train_loop(
-            model,
-            dataset_queue,
-            p,
-            train_config,
-            model_config,
-            model_save_dir,
-            load_model_file
-        )
-    finally:
-        global EXIT_NEED
-        EXIT_NEED = True
+
+    p.start()
+    trainer.train_loop(
+        model,
+        dataset_queue,
+        p,
+        train_config,
+        model_config,
+        model_save_dir,
+        load_model_file
+    )
 
 
 if __name__ == "__main__":
