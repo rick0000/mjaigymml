@@ -89,6 +89,7 @@ def run_extract_process(
                             t.update(1)
                         pool.close()
                     one_chunk.clear()
+
                 except Exception as e:
                     print(e)
                     exit_need = True
@@ -106,9 +107,9 @@ def run(
 
     # 牌譜読み込み定義
     train_mjson_storage = LocalFileMjsonStorage(
-        train_mjson_dir, 1)  # 10000牌譜ファイル分抽出
+        train_mjson_dir, 400000)
     # test_mjson_storage = LocalFileMjsonStorage(
-    #     test_mjson_dir, 100)  # 100牌譜ファイル分抽出
+    #     test_mjson_dir, 100)
 
     # 牌譜解析の設定
     analyser = FeatureAnalyzerFactory.get_analyzer(
