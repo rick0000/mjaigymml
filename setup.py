@@ -10,7 +10,7 @@ setup(
         "dataclasses",
         "mlflow",
         "pyyaml",
-        "mjaigym @ git+https://github.com/rick0000/mjaigym.git@0.2.0",
+        "mjaigym @ git+https://github.com/rick0000/mjaigym.git@0.2.1",
         "h5py",
     ],
 )
